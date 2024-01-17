@@ -43,6 +43,8 @@ long cycleCount = 0;
 int switchState = 0;  //-1 is left, 0 is middle, 1 is right
 int _switchState = 0; 
 
+//LED values
+int LEDBrightness = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -55,6 +57,7 @@ void setup() {
   setupBreathing();
   setupTouch();
   setupSwitch();
+  setupLED();
 }
 
 void loop() {
@@ -63,6 +66,7 @@ void loop() {
   updateBreathing();
   updateTouch();
   updateSwitch();
+  updateLED();
 
   checkSerial();
 
