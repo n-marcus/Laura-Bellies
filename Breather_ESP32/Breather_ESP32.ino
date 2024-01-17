@@ -1,8 +1,21 @@
 #include <elapsedMillis.h>
+#include <esp_now.h>
+#include <WiFi.h>
+#include "common.h"
 
-#define LED_BUILTIN 2
+// common.h
+#ifndef COMMON_H
+#define COMMON_H
+
+typedef struct struct_message {
+  bool beingTouched;
+} struct_message;
+
+#endif
 
 
+// Create a struct_message called myData
+struct_message receivedData;
 
 
 //breath cycle variables
@@ -24,6 +37,7 @@ bool beingTouched = false;
 
 //debug values:
 long cycleCount = 0;
+#define LED_BUILTIN 2
 
 
 void setup() {
@@ -33,6 +47,7 @@ void setup() {
   Serial.println("I am living");
 
   pinMode(LED_BUILTIN, OUTPUT);
+  showMacAdresses();
   setupBreathing();
   setupTouch();
 }

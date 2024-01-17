@@ -19,7 +19,7 @@ void setupTouch() {
   //save the value globally
   touchBaseLevel = average;
   //delay so we can read the serial 
-  delay(2000); 
+  // delay(2000); 
 }
 
 void updateTouch() { 
