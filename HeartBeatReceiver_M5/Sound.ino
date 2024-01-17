@@ -82,7 +82,7 @@ void playHeartbeatSound() {
   numBytesToPlay = constrain(numBytesToPlay, 0, 914158 - 1000);
 
   //this seems to be the sample rate
-  int sampleRate = 176;
+  int sampleRate = 174;
 
   //convert the BPM into a ms length
   Serial.println("Heartbeat rate = " + String(heartbeatRate));
@@ -97,7 +97,7 @@ void playHeartbeatSound() {
   // numBytesToPlay = myData.heartbeatRate;
 
   // numBytesToPlay = numBytesToPlay - (myData.heartbeatRate * 10000);
-  Serial.println("Num bytes = " + String(numBytesToPlay));
+  // Serial.println("Num bytes = " + String(numBytesToPlay));
 
   // Calculate the number of samples to skip
   // int samplesToSkip = int(SAMPLE_RATE * (speedFactor - 1.0));
@@ -106,8 +106,9 @@ void playHeartbeatSound() {
   i2s_write(SPEAK_I2S_NUMBER, &audio_chocobo[startByte], numBytesToPlay, &bytes_written, portMAX_DELAY);
   long length = millis() - startTime;
 
+  Serial.println("");
   Serial.println("--Playing the sound took " + String(length) + "ms");
-  Serial.println("Samplerate seems to be " + String(numBytesToPlay / length));
+  // Serial.println("Samplerate seems to be " + String(numBytesToPlay / length));
   Serial.println("BPM was: " + String(60000 / length));
   Serial.println("");
 }
