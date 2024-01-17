@@ -39,12 +39,12 @@ void updateBreathing() {
     }
 
 
-    analogWrite(BREATHING_OUT_MOTOR, breathingOutMotorValue);
-    analogWrite(BREATHING_IN_MOTOR, breathingInMotorValue);
 
     if (timeSinceLastBreathCycleStart > msPerBreathCycle) {
       //reset the breathing cycle if it is over s
       timeSinceLastBreathCycleStart = 0;
     }
   }
+  analogWrite(BREATHING_OUT_MOTOR, breathingOutMotorValue);
+  analogWrite(BREATHING_IN_MOTOR, breathingInMotorValue);
 }
