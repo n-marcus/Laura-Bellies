@@ -39,7 +39,7 @@ void updateLED() {
 
 
     //make sure the LEDs never fully turn off by setting a minimum of 10 for the brightness
-    LEDBrightness = constrain(LEDBrightness, 10, 255);
+    LEDBrightness = constrain(LEDBrightness, 11, 255);
 
 
 
