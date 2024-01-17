@@ -39,6 +39,10 @@ bool beingTouched = false;
 long cycleCount = 0;
 #define LED_BUILTIN 2
 
+//switch values
+int switchState = 0;  //-1 is left, 0 is middle, 1 is right
+int _switchState = 0; 
+
 
 void setup() {
   // put your setup code here, to run once:
@@ -50,6 +54,7 @@ void setup() {
   showMacAdresses();
   setupBreathing();
   setupTouch();
+  setupSwitch();
 }
 
 void loop() {
@@ -57,6 +62,8 @@ void loop() {
   cycleCount++;
   updateBreathing();
   updateTouch();
+  updateSwitch();
+
   checkSerial();
 
   printDebug();
