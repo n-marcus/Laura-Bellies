@@ -1,9 +1,9 @@
 void setupBreathing() { 
-  pinMode(BLOWING_MOTOR_PIN, OUTPUT);
-  pinMode(SUCKING_MOTOR_PIN, OUTPUT);
+  pinMode(BREATHING_OUT_MOTOR, OUTPUT);
+  pinMode(BREATHING_IN_MOTOR, OUTPUT);
     // Ensure pumps are initially turned off
-  analogWrite(BLOWING_MOTOR_PIN, 0);
-  analogWrite(SUCKING_MOTOR_PIN, 0);
+  analogWrite(BREATHING_IN_MOTOR, 0);
+  analogWrite(BREATHING_OUT_MOTOR, 0);
 }
 
 void updateBreathing() {
@@ -15,7 +15,7 @@ void updateBreathing() {
   breathCycleSineWave = abs(sin(breathCyclePercentage * TWO_PI));
 
   //give it a boost by getting the x-th root
-  breathCycleSineWave = pow(breathCycleSineWave, 0.3);
+  breathCycleSineWave = pow(breathCycleSineWave, 0.1);
 
   //check if we are breathing in or out based on which half of the breathCycle we are in
   if (breathCyclePercentage < 0.5) {
@@ -35,8 +35,8 @@ void updateBreathing() {
   }
 
 
-  analogWrite(SUCKING_MOTOR_PIN, breathingInMotorValue);
-  analogWrite(BLOWING_MOTOR_PIN, breathingOutMotorValue);
+  analogWrite(BREATHING_OUT_MOTOR, breathingOutMotorValue);
+  analogWrite(BREATHING_IN_MOTOR, breathingInMotorValue);
 
   //print some debugging info
   if (cycleCount % 2000 == 0) {
