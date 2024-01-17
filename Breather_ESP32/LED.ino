@@ -3,6 +3,8 @@
 #include <avr/power.h>  // Required for 16 MHz Adafruit Trinket
 #endif
 
+
+
 // Which pin on the Arduino is connected to the NeoPixels?
 // On a Trinket or Gemma we suggest changing this to 1:
 #define LED_PIN 18
@@ -22,14 +24,15 @@ void setupLED() {
 void updateLED() {
   for (int i = 0; i < strip.numPixels(); i++) {  // For each pixel in strip...
     int hueWheelSize = 65536;
-    float hue = 0.5;
+
     int saturation = 180;
     float breathCycleSineWaveLED = abs(sin(breathCyclePercentage * TWO_PI));
     //make it a steeper sloper
-    breathCycleSineWaveLED = pow(breathCycleSineWaveLED, 2);
+    breathCycleSineWaveLED = pow(breathCycleSineWaveLED, LEDPower);
 
+    float hue = defaultHue;
     //make the hue change over time 
-    hue += (breathCycleSineWaveLED * 0.2);
+    hue += (breathCycleSineWaveLED * hueRange);
 
     //convert the floating hue to a hue value on the hue wheel
     int LEDHue = int(float(hueWheelSize) * hue);
@@ -37,9 +40,8 @@ void updateLED() {
     //convert it to LED values
     LEDBrightness = breathCycleSineWaveLED * 255.;
 
-
     //make sure the LEDs never fully turn off by setting a minimum of 10 for the brightness
-    LEDBrightness = constrain(LEDBrightness, 11, 255);
+    LEDBrightness = constrain(LEDBrightness, LEDminimumBrightness, 255);
 
 
 
