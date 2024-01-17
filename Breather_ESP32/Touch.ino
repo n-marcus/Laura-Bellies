@@ -15,7 +15,7 @@ void setupTouch() {
   //calculate the average 
   average = sum / float(NUM_READINGS );
 
-  Serial.println("Average of " + String(NUM_READINGS) + " = " + String(average));
+  Serial.println("Touch average seems to be " + String(NUM_READINGS) + " = " + String(average));
   //save the value globally
   touchBaseLevel = average;
   //delay so we can read the serial 

@@ -58,11 +58,12 @@ void setup() {
   setupTouch();
   setupSwitch();
   setupLED();
-}
+  
+  Serial.println("All setups done, starting life");
+  }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  cycleCount++;
+
   updateBreathing();
   updateTouch();
   updateSwitch();

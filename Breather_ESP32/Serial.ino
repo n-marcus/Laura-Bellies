@@ -36,9 +36,10 @@ void checkSerial() {
 
 
 void printDebug() {
+  cycleCount++;
 
   //print some debugging info
-  if (cycleCount % 2000 == 0) {
+  // if (cycleCount % 2000 == 0) {
     Serial.println("min:0.0,max:1.0,");
     Serial.print("Breath_cycle_percentage:" + String(breathCyclePercentage) + ",");
     // Serial.println("Sine:" + String(breathCycleSineWave));
@@ -47,5 +48,5 @@ void printDebug() {
     // Serial.print("Touch_threshold:" + String(touchBaseLevel - touchThreshold) + ",");
     // Serial.println("Touch_value:" + String(touchValue));
     Serial.println("SwitchState:" + String(switchState));
-  }
+  // }
 }
