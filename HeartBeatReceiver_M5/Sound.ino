@@ -78,8 +78,8 @@ void playHeartbeatSound() {
   long startTime = millis();
   Serial.println("-- Starting to play heartbeat sample now");
   int startByte = 1000;  // Adjust the starting byte position
-  long numBytesToPlay = map(heartbeatRate, 60, 120, 914158, 5000);
-  numBytesToPlay = constrain(numBytesToPlay, 0, 914158 - 1000);
+  // long numBytesToPlay = map(heartbeatRate, 60, 120, 914158, 5000);
+  // numBytesToPlay = constrain(numBytesToPlay, 0, 914158 - 1000);
 
   //this seems to be the sample rate
   int sampleRate = 174;
@@ -93,11 +93,11 @@ void playHeartbeatSound() {
   //convert the desired ms to a length in smaples
   int desiredLengthSamples = int(desiredLengthMs * sampleRate);
 
-  numBytesToPlay = desiredLengthSamples;  // Adjust the number of bytes to play
+  int numBytesToPlay = desiredLengthSamples;  // Adjust the number of bytes to play
   // numBytesToPlay = myData.heartbeatRate;
 
   // numBytesToPlay = numBytesToPlay - (myData.heartbeatRate * 10000);
-  // Serial.println("Num bytes = " + String(numBytesToPlay));
+  Serial.println("Num bytes = " + String(numBytesToPlay));
 
   // Calculate the number of samples to skip
   // int samplesToSkip = int(SAMPLE_RATE * (speedFactor - 1.0));

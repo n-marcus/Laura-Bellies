@@ -17,19 +17,19 @@ typedef struct struct_message {
 // Create a struct_message called myData to hold the received data
 struct_message myData;
 
-int heartbeatRate = 60;
-int currentInterval = 10;
+int heartbeatRate = 60; //default heartbeat rate in bpm
+int currentInterval = 0;
 
 void setup() {
   // Initialize Serial Monitor
   Serial.begin(115200);
 
-  setupLEDs();
 
   M5.begin(true, false, true);
   M5.dis.clear();
   M5.dis.drawpix(0, CRGB(128, 0, 0));
 
+  setupLEDs();
   setupSpeaker();
   setupESPNow();
   delay(100);
