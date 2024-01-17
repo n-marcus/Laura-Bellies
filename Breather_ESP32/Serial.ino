@@ -33,3 +33,18 @@ void checkSerial() {
     }
   }
 }
+
+
+void printDebug() {
+
+  //print some debugging info
+  if (cycleCount % 2000 == 0) {
+    Serial.println("min:0.0,max:1.0,");
+    Serial.print("Breath_cycle_percentage:" + String(breathCyclePercentage) + ",");
+    // Serial.println("Sine:" + String(breathCycleSineWave));
+    Serial.print("Breathing_in_value:" + String(breathingInMotorValue / 255.) + ",");
+    Serial.print("Breathing_out_value:" + String(breathingOutMotorValue / 255.) + ",");
+    Serial.print("Touch_threshold:" + String(touchBaseLevel - touchThreshold) + ",");
+    Serial.println("Touch_value:" + String(touchValue));
+  }
+}

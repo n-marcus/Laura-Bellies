@@ -2,20 +2,28 @@
 
 #define LED_BUILTIN 2
 
-#define BREATHING_IN_MOTOR 23
-#define BREATHING_OUT_MOTOR 22
-#define TOUCH_PIN 4
 
+
+
+//breath cycle variables
 elapsedMillis timeSinceLastBreathCycleStart;
-int breathingBPM = 17;
+int breathingBPM = 5;
 float breathingInMotorValue = 0;
 float breathingOutMotorValue = 0;
 float breathCyclePercentage = 0;
 float breathCycleSineWave = 0;
 bool breathingIn = false;
 int msPerBreathCycle = 60000 / breathingBPM;
-long cycleCount = 0;
 
+
+//Touch values
+float touchValue = 0;
+int touchBaseLevel = 0;
+int touchThreshold = 5;
+bool beingTouched = false;
+
+//debug values:
+long cycleCount = 0;
 
 
 void setup() {
@@ -26,12 +34,15 @@ void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
   setupBreathing();
+  setupTouch();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  cycleCount ++;
+  cycleCount++;
   updateBreathing();
   updateTouch();
   checkSerial();
+
+  printDebug();
 }

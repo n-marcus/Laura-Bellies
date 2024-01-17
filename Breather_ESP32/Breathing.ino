@@ -1,3 +1,6 @@
+#define BREATHING_IN_MOTOR 23
+#define BREATHING_OUT_MOTOR 22
+
 void setupBreathing() { 
   pinMode(BREATHING_OUT_MOTOR, OUTPUT);
   pinMode(BREATHING_IN_MOTOR, OUTPUT);
@@ -37,15 +40,6 @@ void updateBreathing() {
 
   analogWrite(BREATHING_OUT_MOTOR, breathingOutMotorValue);
   analogWrite(BREATHING_IN_MOTOR, breathingInMotorValue);
-
-  //print some debugging info
-  if (cycleCount % 2000 == 0) {
-    Serial.println("min:0.0,max:1.0,");
-    Serial.print("Breath_cycle_percentage:" + String(breathCyclePercentage) + ",");
-    // Serial.println("Sine:" + String(breathCycleSineWave));
-    Serial.print("Breathing_in_value:" + String(breathingInMotorValue / 255.) + ",");
-    Serial.println("Breathing_out_value:" + String(breathingOutMotorValue / 255.));
-  }
 
   if (timeSinceLastBreathCycleStart > msPerBreathCycle) {
     //reset the breathing cycle if it is over s
