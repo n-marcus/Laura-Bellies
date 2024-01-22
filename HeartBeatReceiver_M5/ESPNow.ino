@@ -13,6 +13,8 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
     //if we received a valid heartrate, save it locally
     heartbeatRate = myData.heartbeatRate;
   }
+
+  humanPresence = myData.humanPresence;
 }
 
 void setupESPNow() {

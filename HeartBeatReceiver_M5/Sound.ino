@@ -161,7 +161,9 @@ void playHeartbeatSoundAtRate(float speedFactor) {
 
 
 void updateSound() {
-  playHeartbeatSound();
+  if (humanPresence) {
+    playHeartbeatSound();
+  }
   // playHeartbeatSoundAtRate(1);
   if (timeSinceLastHeartbeatSound > currentInterval) {
     timeSinceLastHeartbeatSound = 0;

@@ -28,13 +28,19 @@ void setupESPNow() {
 void sendESPNowMessage() {
 
   // Set values to send
-  strcpy(myData.a, "Hellow");
+  strcpy(messageToSend.a, "Hellow");
+
+  // if (messageToSend.heartbeatRate > 0 && messageToSend.heartbeatRate > 0) { 
+  //   messageToSend.humanPresence = true;
+  // } else { 
+  //   messageToSend.humanPresence = false;
+  // }
   
-  Serial.println(myData.heartbeatRate);
+  // Serial.println(messageToSend.heartbeatRate);
   // Print the struct_message
-  printStructMessage(myData);
+  printStructMessage(messageToSend);
   // Send message via ESP-NOW
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&myData, sizeof(myData));
+  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&messageToSend, sizeof(messageToSend));
 
   if (result == ESP_OK) {
     Serial.println("Sent with success");

@@ -18,6 +18,7 @@ typedef struct struct_message {
 struct_message myData;
 
 int heartbeatRate = 60; //default heartbeat rate in bpm
+bool humanPresence = true;
 int currentInterval = 0;
 
 void setup() {

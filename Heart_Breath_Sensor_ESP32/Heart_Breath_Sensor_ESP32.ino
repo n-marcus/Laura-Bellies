@@ -2,19 +2,26 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <esp_now.h>
+#include <elapsedMillis.h>
 
 #define RXD2 16
 #define TXD2 17
 #include <60ghzbreathheart.h>
 
+#define LED_BUILTIN 2
+
 BreathHeart_60GHz radar = BreathHeart_60GHz(&Serial2);
 unsigned long delay_Intial = 0;
 const long delay_interval = 1000;
 unsigned long measure_Intial = 0;
-const long measure_interval = 20000;
+const long measure_interval = 500;
 int Human_pesence_pin = 27;
 int Human_presence;
 int Heart_rate_measure_button_pin = 26;
+
+
+elapsedMillis timeSinceLastSuccesfulReading;
+int maxTimeSinceLastSucessfulReading = 10000;
 
 // Structure example to send data
 // Must match the receiver structure
@@ -26,7 +33,7 @@ typedef struct struct_message {
 } struct_message;
 
 // Create a struct_message called myData
-struct_message myData;
+struct_message messageToSend;
 
 esp_now_peer_info_t peerInfo;
 
@@ -53,9 +60,9 @@ void setup() {
   Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);  //RX2,TX2 OF ESP32
   pinMode(Heart_rate_measure_button_pin, INPUT);
   pinMode(Human_pesence_pin, INPUT);
+  pinMode(LED_BUILTIN, OUTPUT);
 
   setupESPNow();
-
 }
 
 void loop() {
@@ -63,6 +70,17 @@ void loop() {
   // IR_Status = digitalRead(IR_Sensor_pin);
   Human_presence = digitalRead(Human_pesence_pin);
 
-  Serial.println("Heart_rate_monitoring_system_acitve");
+  if (timeSinceLastSuccesfulReading > maxTimeSinceLastSucessfulReading || (messageToSend.heartbeatRate == 0 && messageToSend.breathingsPerMinute == 0)) {
+    // Serial.println("No one is here it seems...");
+    messageToSend.humanPresence = false;
+    sendESPNowMessage();
+  } else if (messageToSend.heartbeatRate > 0 || messageToSend.breathingsPerMinute > 0) {
+    messageToSend.humanPresence = true;
+  }
+  //show the led when there seems to be someone close to the sensor
+  digitalWrite(LED_BUILTIN, messageToSend.humanPresence);
+
+  // Serial.println("Heart_rate_monitoring_system_acitve");
   HR_BR();
+  delay(100);
 }
