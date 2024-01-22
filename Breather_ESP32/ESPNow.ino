@@ -1,10 +1,10 @@
 // Insert the MAC address of the receiver board: B
-uint8_t broadcastAddress[] = {0x48, 0xE7, 0x29, 0xAD, 0x16, 0x00};
+uint8_t broadcastAddress[] = { 0x48, 0xE7, 0x29, 0xAD, 0x16, 0x00 };
 
 esp_now_peer_info_t peerInfo;
 
-void setupESPNow() { 
-   // Set device as a Wi-Fi Station
+void setupESPNow() {
+  // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
 
   // Init ESP-NOW
@@ -15,13 +15,13 @@ void setupESPNow() {
   //
   esp_now_register_send_cb(OnDataSent);
 
- // Register peer
+  // Register peer
   memcpy(peerInfo.peer_addr, broadcastAddress, 6);
-  peerInfo.channel = 0;  
+  peerInfo.channel = 0;
   peerInfo.encrypt = false;
-  
-  // Add peer        
-  if (esp_now_add_peer(&peerInfo) != ESP_OK){
+
+  // Add peer
+  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
     Serial.println("Failed to add peer");
     return;
   }
@@ -40,16 +40,33 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 
 
 // callback function that will be executed when data is received
-void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   memcpy(&receivedData, incomingData, sizeof(receivedData));
-  Serial.print("Bytes received: ");
-  Serial.println(len);
-  // Serial.print("Char: ");
-  // Serial.println(myDataB.a);
-  // Serial.print("Is button B pressed = ");
-  // Serial.println(myDataB.isButtonBPressed);
-  // Serial.print("Touch B Value = ");
-  // Serial.println(myDataB.touchValueB); // Print received touchValue
-  // Serial.println();
+  Serial.println("Received data!");
+  Serial.println("breathingsPerMinute " + String(receivedData.breathingsPerMinute));
+  Serial.println("Human presence" + String(receivedData.humanPresence));
+  Serial.println("Heartrate" + String(receivedData.heartbeatRate));
+  // Serial.print("Bytes received: ");
+  // Serial.println(len);
 
+  //save the received human presence
+  humanPresence = receivedData.humanPresence;
+
+
+  //if there is a valid breath bpm detected, reflect in the bpm
+  if (receivedData.breathingsPerMinute > 0) {
+    //it will crash because of a divide by zero error if it receives zero for the bpm
+    breathingBPM = receivedData.breathingsPerMinute;
+    msPerBreathCycle = 60000 / breathingBPM;
+  } else {
+    humanPresence = false;
+  }
+
+  if (receivedData.breathingsPerMinute == 0 || receivedData.humanPresence == false) {
+    //if there is no human detected, return to a verrry slow bpm
+    breathingBPM = defaultBreathingBPMWithoutHumanDetected;
+    msPerBreathCycle = 60000 / breathingBPM;
+  }
+
+  Serial.println("Received breathings per minute " + String(breathingBPM));
 }

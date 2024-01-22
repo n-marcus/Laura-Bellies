@@ -43,8 +43,18 @@ void updateBreathing() {
     if (timeSinceLastBreathCycleStart > msPerBreathCycle) {
       //reset the breathing cycle if it is over s
       timeSinceLastBreathCycleStart = 0;
+      numBreathingCycles ++;
+      Serial.println("New breathing cycle " + String(numBreathingCycles));
+      Serial.println("Breathing BPM is now" + String(breathingBPM));
     }
   }
+
+  if (breathingIn != _breathingIn) { 
+    Serial.println("Breathing direction changed to " + String(breathingIn));
+  }
+
+  //keep track of direction changes over time
+  _breathingIn = breathingIn;
   analogWrite(BREATHING_OUT_MOTOR, breathingOutMotorValue);
   analogWrite(BREATHING_IN_MOTOR, breathingInMotorValue);
 }

@@ -12,7 +12,7 @@ void Measure_Breath_Heart_rate() {
       case BREATHVAL:
         Serial.print("Sensor monitored the current breath rate value is: ");
         Serial.print(radar.breath_rate, DEC);
-        messageToSend.breathingsPerMinute = int(radar.breath_rate);
+        messageToSend.breathingsPerMinute = int(radar.breath_rate / 2);
         Serial.println();
         break;
     }

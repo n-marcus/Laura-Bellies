@@ -27,7 +27,6 @@ void updateSwitch() {
 
   if (switchState != _switchState) {
     //if the state of the button changed
-    Serial.println("Switch state changed!");
 
     //decide how we should be breathing
     if (switchState == 0) {
@@ -40,6 +39,7 @@ void updateSwitch() {
       breathingOutMotorValue = 0;
       breathingInMotorValue = 255;
     }
+    Serial.println("Switch state changed to " + String(switchState));
     //reset the time since last breath to make sure the breath cycle starts over again
     timeSinceLastBreathCycleStart = 0;
   }

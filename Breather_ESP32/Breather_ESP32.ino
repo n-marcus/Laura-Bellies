@@ -9,6 +9,8 @@
 //This is the default speed of breathing
 //best is somewhere between 2 and 40
 int breathingBPM = 5;
+int defaultBreathingBPMWithoutHumanDetected = 5;
+
 
 //This is the base position on the hue wheel (0.5 is a kind of blue)
 //see here https://learn.adafruit.com/assets/74094
@@ -31,16 +33,14 @@ float LEDPower = 0.4;
 //AFBLIJVEN LAURA
 //AFBLIJVEN LAURA
 
-// common.h
-#ifndef COMMON_H
-#define COMMON_H
-
+// Structure example to send data
+// Must match the receiver structure
 typedef struct struct_message {
-  bool beingTouched;
+  char a[32];
+  int heartbeatRate;
+  bool humanPresence;
+  int breathingsPerMinute;
 } struct_message;
-
-#endif
-
 
 // Create a struct_message called myData
 struct_message receivedData;
@@ -52,7 +52,9 @@ float breathingInMotorValue = 0;
 float breathingOutMotorValue = 0;
 float breathCyclePercentage = 0;
 float breathCycleSineWave = 0;
+int numBreathingCycles = 0;
 bool breathingIn = false;
+bool _breathingIn = false;
 int msPerBreathCycle = 60000 / breathingBPM;
 
 
@@ -65,6 +67,9 @@ bool beingTouched = false;
 //debug values:
 long cycleCount = 0;
 #define LED_BUILTIN 2
+
+//ESPNow data
+bool humanPresence = true;
 
 //switch values
 int switchState = 0;  //-1 is left, 0 is middle, 1 is right
@@ -85,6 +90,9 @@ void setup() {
   setupTouch();
   setupSwitch();
   setupLED();
+  setupESPNow();
+
+  showMacAdresses();
   
   Serial.println("All setups done, starting life");
   }
@@ -98,5 +106,5 @@ void loop() {
 
   checkSerial();
 
-  printDebug();
+  // printDebug();
 }

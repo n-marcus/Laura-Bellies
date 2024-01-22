@@ -38,14 +38,11 @@ struct_message messageToSend;
 esp_now_peer_info_t peerInfo;
 
 // REPLACE WITH YOUR RECEIVER MAC Address
-uint8_t broadcastAddress[] = { 0x64, 0xB7, 0x08, 0xB8, 0x37, 0xA0 };
+// uint8_t broadcastAddress[] = { 0x64, 0xB7, 0x08, 0xB8, 0x37, 0xA0 };
+// uint8_t broadcastAddress[] = { 0x48, 0xE7, 0x29, 0xB6, 0x74, 0x30 };
+uint8_t broadcastAddress[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
 
-// callback when data is sent
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  // Serial.print("\r\nLast Packet Send Status:\t");
-  // Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
-}
 
 
 void _delay() {
@@ -71,10 +68,13 @@ void loop() {
   Human_presence = digitalRead(Human_pesence_pin);
 
   if (timeSinceLastSuccesfulReading > maxTimeSinceLastSucessfulReading || (messageToSend.heartbeatRate == 0 && messageToSend.breathingsPerMinute == 0)) {
-    // Serial.println("No one is here it seems...");
+    //if more than 10 seconds passed without a succesful reading, or if both the two sensor readings returned zero, we agree there is noone here
     messageToSend.humanPresence = false;
+
+    //send update immediately to turn the heartbeat off
     sendESPNowMessage();
   } else if (messageToSend.heartbeatRate > 0 || messageToSend.breathingsPerMinute > 0) {
+    //if any of the sensor readings have been succesful, we can agree there is someoen in front of the sensor
     messageToSend.humanPresence = true;
   }
   //show the led when there seems to be someone close to the sensor
