@@ -1,6 +1,9 @@
 #define BREATHING_IN_MOTOR 23
 #define BREATHING_OUT_MOTOR 22
 
+bool shouldBeBreathing = false;
+
+
 void setupBreathing() {
   pinMode(BREATHING_OUT_MOTOR, OUTPUT);
   pinMode(BREATHING_IN_MOTOR, OUTPUT);
@@ -11,7 +14,7 @@ void setupBreathing() {
 
 void updateBreathing() {
 
-  if (switchState == 0) {
+  if (switchState == 0 && shouldBeBreathing) {
     //calculate how far we are in the entire breathcycle
     breathCyclePercentage = float(timeSinceLastBreathCycleStart) / float(msPerBreathCycle);
 
@@ -44,13 +47,19 @@ void updateBreathing() {
       //reset the breathing cycle if it is over s
       timeSinceLastBreathCycleStart = 0;
       numBreathingCycles ++;
-      Serial.println("New breathing cycle " + String(numBreathingCycles));
-      Serial.println("Breathing BPM is now" + String(breathingBPM));
+      Serial.println("New breathing cycle: " + String(numBreathingCycles));
+      Serial.println("Breathing BPM is now: " + String(breathingBPM));
     }
   }
 
   if (breathingIn != _breathingIn) { 
-    Serial.println("Breathing direction changed to " + String(breathingIn));
+    Serial.println("Breathing direction changed to: " + String(breathingIn));
+    if (humanPresence == 0) { 
+      //if there is no human presence anymore 
+      shouldBeBreathing = false;
+      breathingInMotorValue = 0;
+      breathingOutMotorValue = 0;
+    }
   }
 
   //keep track of direction changes over time

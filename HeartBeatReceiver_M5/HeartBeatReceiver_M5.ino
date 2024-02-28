@@ -21,7 +21,7 @@ int heartbeatRate = 60; //default heartbeat rate in bpm
 bool humanPresence = true;
 int currentInterval = 0;
 
-#define POD_IDENTIFIER 'a'
+#define POD_IDENTIFIER 'b'
 
 
 #define RED_LED_PIN 10

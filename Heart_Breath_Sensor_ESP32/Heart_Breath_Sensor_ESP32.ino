@@ -20,6 +20,8 @@ int Human_presence;
 int Heart_rate_measure_button_pin = 26;
 
 #define TARGET_POD 'a'
+//a is BLACK
+//b is RED
 
 elapsedMillis timeSinceLastSuccesfulReading;
 int maxTimeSinceLastSucessfulReading = 10000;

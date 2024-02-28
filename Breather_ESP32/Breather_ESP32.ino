@@ -19,14 +19,15 @@ float defaultHue = 0.5;
 //(hue + hueRange cannot be more than 1 otherwise, I dont know what will happen)
 float hueRange = 0.2; 
 //this is the minimum brightness the LEDs can get, should be somewhere between 0 and 255
-int LEDminimumBrightness = 50;
+int LEDminimumBrightness = 140;
 
 //lower values (between 0 and 1) make the brightness curve of the LEDs steeper
 float LEDPower = 0.4;
 
 //This is the name of the pod so it listens to the correct messages 
-#define POD_IDENTIFIER 'a'
-
+#define POD_IDENTIFIER 'a' //either 'a' or 'b'
+//a is BLACK
+//b is RED
 
 //STOP EDITING BELOW THIS
 // VERY DANGEROUS 
@@ -80,7 +81,7 @@ int switchState = 0;  //-1 is left, 0 is middle, 1 is right
 int _switchState = 0; 
 
 //LED values
-int LEDBrightness = 0;
+float LEDBrightness = 0;
 
 void setup() {
   // put your setup code here, to run once:

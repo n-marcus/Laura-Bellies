@@ -43,21 +43,29 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   memcpy(&receivedData, incomingData, sizeof(receivedData));
   bool targetIsMe = receivedData.target == POD_IDENTIFIER;
-  Serial.print("Received data for " + String(receivedData.target));
-  if (targetIsMe) Serial.println(" which is me!");
+  Serial.print("---Received data for " + String(receivedData.target));
+  if (targetIsMe) Serial.print(" which is me!");
+  Serial.println("");
+
+  if (receivedData.breathingsPerMinute == 0 && receivedData.humanPresence == 0 && receivedData.heartbeatRate == 0) {
+    Serial.println("All readings are 0");
+    Serial.println(" ");
+  } else {
+    //if everything was 0
+    Serial.print("breathingsPerMinute: " + String(receivedData.breathingsPerMinute));
+    Serial.print(" Human presence: " + String(receivedData.humanPresence));
+    Serial.println(" Heartrate: " + String(receivedData.heartbeatRate));
+    Serial.println(" ");
+  }
 
   if (targetIsMe) {
-
-    if (receivedData.breathingsPerMinute == 0 && receivedData.humanPresence == 0 && receivedData.heartbeatRate == 0) {
-      Serial.println("All readings are 0");
-    } else {
-      //if everything was 0 
-      Serial.println("breathingsPerMinute " + String(receivedData.breathingsPerMinute));
-      Serial.println("Human presence" + String(receivedData.humanPresence));
-      Serial.println("Heartrate" + String(receivedData.heartbeatRate));
-    }
     //save the received human presence
     humanPresence = receivedData.humanPresence;
+
+    //if there is human presence, we should be breathing
+    if (humanPresence == 1) {
+      shouldBeBreathing = true;
+    }
 
 
     //if there is a valid breath bpm detected, reflect in the bpm

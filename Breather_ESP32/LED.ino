@@ -12,21 +12,30 @@
 // How many NeoPixels are attached to the Arduino?
 #define LED_COUNT 23
 
+int LEDHue = 0;
+int saturation = 180;
+float fadeInPercentage = 0.0;
+
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 void setupLED() {
 
   strip.begin();             // INITIALIZE NeoPixel strip object (REQUIRED)
   strip.show();              // Turn OFF all pixels ASAP
-  strip.setBrightness(150);  // Set BRIGHTNESS to about 1/5 (max = 255)
+  strip.setBrightness(255);  // Set BRIGHTNESS to about 1/5 (max = 255)
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void updateLED() {
   if (humanPresence) {
+      //show the led when there seems to be someone close to the sensor
+    digitalWrite(LED_BUILTIN, HIGH);
+    fadeInPercentage = constrain(fadeInPercentage + 0.01, 0.0, 1.0);
+    // Serial.println("FadeInPercentage:" + String(fadeInPercentage));
     for (int i = 0; i < strip.numPixels(); i++) {  // For each pixel in strip...
       int hueWheelSize = 65536;
 
-      int saturation = 180;
+      saturation = 180;
       float breathCycleSineWaveLED = abs(sin(breathCyclePercentage * TWO_PI));
       //make it a steeper sloper
       breathCycleSineWaveLED = pow(breathCycleSineWaveLED, LEDPower);
@@ -36,10 +45,14 @@ void updateLED() {
       hue += (breathCycleSineWaveLED * hueRange);
 
       //convert the floating hue to a hue value on the hue wheel
-      int LEDHue = int(float(hueWheelSize) * hue);
+      LEDHue = int(float(hueWheelSize) * hue);
 
       //convert it to LED values
       LEDBrightness = breathCycleSineWaveLED * 255.;
+
+      //slowly fade the LEDs in when we detect a human again
+      // LEDBrightness = LEDBrightness * fadeInPercentage;
+      
 
       //make sure the LEDs never fully turn off by setting a minimum of 10 for the brightness
       LEDBrightness = constrain(LEDBrightness, LEDminimumBrightness, 255);
@@ -47,14 +60,21 @@ void updateLED() {
 
 
       //calculate an LED color
-      uint32_t rgbcolor = strip.ColorHSV(LEDHue, saturation, LEDBrightness);
+      uint32_t rgbcolor = strip.ColorHSV(LEDHue, saturation, LEDBrightness * fadeInPercentage);
 
       //fill the strip with it
       strip.fill(rgbcolor);
       strip.show();  //  Update strip to match
     }
   } else {
-    strip.fill(strip.ColorHSV(0,0,0));
+    digitalWrite(LED_BUILTIN, LOW);
+    //slowly fade the LED strip out
+    LEDBrightness -= 0.1;
+    LEDBrightness = constrain(LEDBrightness, 0, 255);
+    uint32_t rgbcolor = strip.ColorHSV(LEDHue, saturation, LEDBrightness);
+    fadeInPercentage = 0.0; //make sure we fade in when we get data next time
+
+    strip.fill(rgbcolor);
     strip.show();
   }
 }
