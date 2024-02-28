@@ -1,6 +1,6 @@
 void printStructMessage(const struct_message &msg) {
-  Serial.print("a: ");
-  Serial.println(msg.a);
+  // Serial.print("a: ");
+  // Serial.println(msg.a);
 
   Serial.print("heartbeatRate: ");
   Serial.println(msg.heartbeatRate);

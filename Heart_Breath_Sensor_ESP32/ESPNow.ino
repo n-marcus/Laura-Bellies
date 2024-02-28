@@ -1,3 +1,5 @@
+long messagesSend = 0;
+
 void setupESPNow() { 
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
@@ -27,7 +29,7 @@ void setupESPNow() {
 void sendESPNowMessage() {
 
   // Set values to send
-  strcpy(messageToSend.a, "Hellow");
+  // strcpy(messageToSend.a, "Hellow");
 
   // if (messageToSend.heartbeatRate > 0 && messageToSend.heartbeatRate > 0) { 
   //   messageToSend.humanPresence = true;
@@ -42,7 +44,8 @@ void sendESPNowMessage() {
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&messageToSend, sizeof(messageToSend));
 
   if (result == ESP_OK) {
-    Serial.println("Sent with success");
+    messagesSend ++;
+    Serial.println("ESP Now message sent with success " + String(messagesSend));
   } else {
     Serial.println("Error sending the data");
   }
@@ -50,9 +53,9 @@ void sendESPNowMessage() {
 
 // Callback function that will be called when data is sent
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  if (status == ESP_NOW_SEND_SUCCESS) {
-    Serial.println("Message sent successfully");
-  } else {
-    Serial.println("Error sending the message");
-  }
+  // if (status == ESP_NOW_SEND_SUCCESS) {
+  //   Serial.println("Message sent successfully");
+  // } else {
+  //   Serial.println("Error sending the message");
+  // }
 }

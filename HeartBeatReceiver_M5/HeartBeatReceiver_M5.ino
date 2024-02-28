@@ -8,7 +8,7 @@
 // Structure example to receive data
 // Must match the sender structure
 typedef struct struct_message {
-  char a[32];
+  char target;
   int heartbeatRate;
   bool humanPresence;
   int breathingsPerMinute;
@@ -20,6 +20,11 @@ struct_message myData;
 int heartbeatRate = 60; //default heartbeat rate in bpm
 bool humanPresence = true;
 int currentInterval = 0;
+
+#define POD_IDENTIFIER 'a'
+
+
+#define RED_LED_PIN 10
 
 void setup() {
   // Initialize Serial Monitor

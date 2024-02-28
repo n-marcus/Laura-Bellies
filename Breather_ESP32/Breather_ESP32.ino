@@ -24,6 +24,10 @@ int LEDminimumBrightness = 50;
 //lower values (between 0 and 1) make the brightness curve of the LEDs steeper
 float LEDPower = 0.4;
 
+//This is the name of the pod so it listens to the correct messages 
+#define POD_IDENTIFIER 'a'
+
+
 //STOP EDITING BELOW THIS
 // VERY DANGEROUS 
 //NO INSURANCE WILL COVER IF YOU EDIT BELOW THIS
@@ -36,7 +40,7 @@ float LEDPower = 0.4;
 // Structure example to send data
 // Must match the receiver structure
 typedef struct struct_message {
-  char a[32];
+  char target;
   int heartbeatRate;
   bool humanPresence;
   int breathingsPerMinute;

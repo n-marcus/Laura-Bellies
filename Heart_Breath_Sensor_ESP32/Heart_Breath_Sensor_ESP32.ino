@@ -19,6 +19,7 @@ int Human_pesence_pin = 27;
 int Human_presence;
 int Heart_rate_measure_button_pin = 26;
 
+#define TARGET_POD 'a'
 
 elapsedMillis timeSinceLastSuccesfulReading;
 int maxTimeSinceLastSucessfulReading = 10000;
@@ -26,7 +27,7 @@ int maxTimeSinceLastSucessfulReading = 10000;
 // Structure example to send data
 // Must match the receiver structure
 typedef struct struct_message {
-  char a[32];
+  char target;
   int heartbeatRate;
   bool humanPresence;
   int breathingsPerMinute;
@@ -58,6 +59,7 @@ void setup() {
   pinMode(Heart_rate_measure_button_pin, INPUT);
   pinMode(Human_pesence_pin, INPUT);
   pinMode(LED_BUILTIN, OUTPUT);
+  messageToSend.target = TARGET_POD;
 
   setupESPNow();
 }

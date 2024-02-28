@@ -1,20 +1,28 @@
 // callback function that will be executed when data is received
 void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   memcpy(&myData, incomingData, sizeof(myData));
-  Serial.print("Bytes received: ");
-  Serial.println(len);
-  Serial.print("Char: ");
-  Serial.println(myData.a);
-  Serial.print("Heartbeat rate = ");
-  Serial.println(myData.heartbeatRate);  // Print received touchValue
-  Serial.println();
+  // Serial.print("Bytes received: ");
+  // Serial.println(len);
+  // Serial.print("Char: ");
+  // // Serial.println(myData.a);
+  Serial.println("Got message for pod " + String(myData.target));
 
-  if (myData.heartbeatRate > 0 && myData.heartbeatRate < 300) {
-    //if we received a valid heartrate, save it locally
-    heartbeatRate = myData.heartbeatRate;
+  if (myData.target == POD_IDENTIFIER) {
+    //if this is for this pod, save the data locally 
+    Serial.print("Heartbeat rate = ");
+    Serial.print(myData.heartbeatRate);                     // Print received heartbeat
+    Serial.print(" with target " + String(myData.target));  // Print received heartbeat
+    Serial.println();
+
+    if (myData.heartbeatRate > 0 && myData.heartbeatRate < 300) {
+      //if we received a valid heartrate, save it locally
+      heartbeatRate = myData.heartbeatRate;
+    }
+
+    humanPresence = myData.humanPresence;
+  } else { 
+    Serial.println("Message for different pod, skipping!");
   }
-
-  humanPresence = myData.humanPresence;
 }
 
 void setupESPNow() {
