@@ -1,5 +1,5 @@
 // Insert the MAC address of the receiver board: B
-uint8_t broadcastAddress[] = { 0x48, 0xE7, 0x29, 0xAD, 0x16, 0x00 };
+uint8_t broadcastAddress[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
 esp_now_peer_info_t peerInfo;
 
@@ -37,18 +37,46 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
 }
 
+void sendData() {
+  //if this is pod a, send it to pod b and in reverse
+  messageToSend.target = POD_IDENTIFIER == 'a' ? 'b' : 'a';
 
+  messageToSend.heartbeatRate = 0;
+  messageToSend.humanPresence = false;
+  messageToSend.breathingsPerMinute = 0;
+
+
+  //include whether this one is being touched or not
+  messageToSend.beingTouched = beingTouched;
+  //signal that this message is about being touched or not
+  messageToSend.isAboutTouch = true;
+
+  Serial.println("About to send message");
+  printStructMessage(messageToSend);
+
+
+  //try to send the message
+  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&messageToSend, sizeof(messageToSend));
+
+  if (result == ESP_OK) {
+    messagesSend++;
+    Serial.println("ESP Now message sent with success #" + String(messagesSend));
+  } else {
+    Serial.println("Error sending the data");
+  }
+}
 
 // callback function that will be executed when data is received
 void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
+  messagesReceived++;
   memcpy(&receivedData, incomingData, sizeof(receivedData));
   bool targetIsMe = receivedData.target == POD_IDENTIFIER;
-  Serial.print("---Received data for " + String(receivedData.target));
+  Serial.print("---Received data #" + String(messagesReceived) + " for " + String(receivedData.target));
   if (targetIsMe) Serial.print(" which is me!");
   Serial.println("");
 
   if (receivedData.breathingsPerMinute == 0 && receivedData.humanPresence == 0 && receivedData.heartbeatRate == 0) {
-    Serial.println("All readings are 0");
+    Serial.println("All readings are 0 and not about being touched");
     Serial.println(" ");
   } else {
     //if everything was 0
@@ -59,28 +87,38 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   }
 
   if (targetIsMe) {
-    //save the received human presence
-    humanPresence = receivedData.humanPresence;
 
-    //if there is human presence, we should be breathing
-    if (humanPresence == 1) {
-      shouldBeBreathing = true;
-    }
+    if (receivedData.isAboutTouch) {
+      Serial.println("Received info about other pod being touched " + String(receivedData.beingTouched));
 
-
-    //if there is a valid breath bpm detected, reflect in the bpm
-    if (receivedData.breathingsPerMinute > 0) {
-      //it will crash because of a divide by zero error if it receives zero for the bpm
-      breathingBPM = receivedData.breathingsPerMinute;
-      msPerBreathCycle = 60000 / breathingBPM;
+      //save whether the other pod is being touched localy 
+      setOtherPodTouched(receivedData.beingTouched);
+      
     } else {
-      humanPresence = false;
-    }
+      //if this is not about being touched, but a message from the heartbeat sensor
+      //save the received human presence
+      humanPresence = receivedData.humanPresence;
 
-    if (receivedData.breathingsPerMinute == 0 || receivedData.humanPresence == false) {
-      //if there is no human detected, return to a verrry slow bpm
-      breathingBPM = defaultBreathingBPMWithoutHumanDetected;
-      msPerBreathCycle = 60000 / breathingBPM;
+      //if there is human presence, we should be breathing
+      if (humanPresence == 1) {
+        shouldBeBreathing = true;
+      }
+
+
+      //if there is a valid breath bpm detected, reflect in the bpm
+      if (receivedData.breathingsPerMinute > 0) {
+        //it will crash because of a divide by zero error if it receives zero for the bpm
+        breathingBPM = receivedData.breathingsPerMinute;
+        msPerBreathCycle = 60000 / breathingBPM;
+      } else {
+        humanPresence = false;
+      }
+
+      if (receivedData.breathingsPerMinute == 0 || receivedData.humanPresence == false) {
+        //if there is no human detected, return to a verrry slow bpm
+        breathingBPM = defaultBreathingBPMWithoutHumanDetected;
+        msPerBreathCycle = 60000 / breathingBPM;
+      }
     }
   } else {
     Serial.println("Got message for different pod, namely: " + String(receivedData.target));

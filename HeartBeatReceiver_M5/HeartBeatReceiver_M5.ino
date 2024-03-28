@@ -12,12 +12,13 @@ typedef struct struct_message {
   int heartbeatRate;
   bool humanPresence;
   int breathingsPerMinute;
+  bool beingTouched;
 } struct_message;
 
 // Create a struct_message called myData to hold the received data
 struct_message myData;
 
-int heartbeatRate = 60; //default heartbeat rate in bpm
+int heartbeatRate = 60;  //default heartbeat rate in bpm
 bool humanPresence = true;
 int currentInterval = 0;
 
@@ -43,7 +44,7 @@ void setup() {
 
 
 void loop() {
-  updateSound(); 
+  updateSound();
   updateLEDs();
   checkSerial();
   M5.update();  // You can still call M5.update() if needed

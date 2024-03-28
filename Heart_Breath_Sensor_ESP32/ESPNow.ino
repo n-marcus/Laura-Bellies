@@ -1,6 +1,7 @@
 long messagesSend = 0;
+long messagesReceived = 0;
 
-void setupESPNow() { 
+void setupESPNow() {
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
 
@@ -24,6 +25,10 @@ void setupESPNow() {
     Serial.println("Failed to add peer");
     return;
   }
+
+  // Once ESPNow is successfully Init, we will register for recv CB to
+  // get recv packer info
+  esp_now_register_recv_cb(reinterpret_cast<esp_now_recv_cb_t>(OnDataRecv));
 }
 
 void sendESPNowMessage() {
@@ -31,21 +36,24 @@ void sendESPNowMessage() {
   // Set values to send
   // strcpy(messageToSend.a, "Hellow");
 
-  // if (messageToSend.heartbeatRate > 0 && messageToSend.heartbeatRate > 0) { 
+  // if (messageToSend.heartbeatRate > 0 && messageToSend.heartbeatRate > 0) {
   //   messageToSend.humanPresence = true;
-  // } else { 
+  // } else {
   //   messageToSend.humanPresence = false;
   // }
-  
+
   // Serial.println(messageToSend.heartbeatRate);
   // Print the struct_message
-  printStructMessage(messageToSend);
+
+  //this node will never send anything about touch because it does not have a touch sensor
+  messageToSend.isAboutTouch = false;
+  // printStructMessage(messageToSend);
   // Send message via ESP-NOW
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&messageToSend, sizeof(messageToSend));
 
   if (result == ESP_OK) {
-    messagesSend ++;
-    Serial.println("ESP Now message sent with success " + String(messagesSend));
+    messagesSend++;
+    Serial.println("ESP Now message sent with success #" + String(messagesSend));
   } else {
     Serial.println("Error sending the data");
   }
@@ -58,4 +66,12 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   // } else {
   //   Serial.println("Error sending the message");
   // }
+}
+
+// callback function that will be executed when data is received
+void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
+  messagesReceived++;
+  memcpy(&receivedData, incomingData, sizeof(receivedData));
+  Serial.print("---Received data #" + String(messagesReceived) + " for " + String(receivedData.target));
+  // printStructMessage(receivedData);
 }

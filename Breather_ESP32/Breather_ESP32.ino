@@ -25,7 +25,7 @@ int LEDminimumBrightness = 140;
 float LEDPower = 0.4;
 
 //This is the name of the pod so it listens to the correct messages 
-#define POD_IDENTIFIER 'a' //either 'a' or 'b'
+#define POD_IDENTIFIER 'b' //either 'a' or 'b'
 //a is BLACK
 //b is RED
 
@@ -45,10 +45,13 @@ typedef struct struct_message {
   int heartbeatRate;
   bool humanPresence;
   int breathingsPerMinute;
+  bool beingTouched;
+  bool isAboutTouch;
 } struct_message;
 
 // Create a struct_message called myData
 struct_message receivedData;
+struct_message messageToSend;
 
 
 //breath cycle variables
@@ -62,12 +65,16 @@ bool breathingIn = false;
 bool _breathingIn = false;
 int msPerBreathCycle = 60000 / breathingBPM;
 
+int messagesReceived = 0;
+int messagesSend = 0;
+
 
 //Touch values
 float touchValue = 0;
 int touchBaseLevel = 0;
 int touchThreshold = 5;
 bool beingTouched = false;
+bool _beingTouched = false;
 
 //debug values:
 long cycleCount = 0;
@@ -111,5 +118,5 @@ void loop() {
 
   checkSerial();
 
-  // printDebug();
+  // printDebug(); 
 }

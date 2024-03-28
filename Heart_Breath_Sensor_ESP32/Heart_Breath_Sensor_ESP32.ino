@@ -33,10 +33,13 @@ typedef struct struct_message {
   int heartbeatRate;
   bool humanPresence;
   int breathingsPerMinute;
+  bool beingTouched;
+  bool isAboutTouch;
 } struct_message;
 
 // Create a struct_message called myData
 struct_message messageToSend;
+struct_message receivedData;
 
 esp_now_peer_info_t peerInfo;
 
