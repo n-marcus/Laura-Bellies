@@ -3,6 +3,8 @@
 #include <WiFi.h>
 #include "common.h"
 
+#include "LPFilter.hpp"
+
 
 //HERE YOU CAN EDIT STUFF LAURA 
 
@@ -72,7 +74,7 @@ int messagesSend = 0;
 //Touch values
 float touchValue = 0;
 int touchBaseLevel = 0;
-int touchThreshold = 5;
+int touchThreshold = 3;
 bool beingTouched = false;
 bool _beingTouched = false;
 
@@ -118,5 +120,5 @@ void loop() {
 
   checkSerial();
 
-  // printDebug(); 
+  printDebug(); 
 }

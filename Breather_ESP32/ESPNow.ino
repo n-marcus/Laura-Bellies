@@ -75,11 +75,11 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   if (targetIsMe) Serial.print(" which is me!");
   Serial.println("");
 
-  if (receivedData.breathingsPerMinute == 0 && receivedData.humanPresence == 0 && receivedData.heartbeatRate == 0) {
+  if (targetIsMe && receivedData.breathingsPerMinute == 0 && receivedData.humanPresence == 0 && receivedData.heartbeatRate == 0) {
     Serial.println("All readings are 0 and not about being touched");
     Serial.println(" ");
-  } else {
-    //if everything was 0
+  } else if (targetIsMe) {
+    //if everything was not 0
     Serial.print("breathingsPerMinute: " + String(receivedData.breathingsPerMinute));
     Serial.print(" Human presence: " + String(receivedData.humanPresence));
     Serial.println(" Heartrate: " + String(receivedData.heartbeatRate));

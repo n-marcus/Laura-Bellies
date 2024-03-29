@@ -47,13 +47,13 @@ void sendESPNowMessage() {
 
   //this node will never send anything about touch because it does not have a touch sensor
   messageToSend.isAboutTouch = false;
-  // printStructMessage(messageToSend);
+  printStructMessage(messageToSend);
   // Send message via ESP-NOW
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&messageToSend, sizeof(messageToSend));
 
   if (result == ESP_OK) {
     messagesSend++;
-    Serial.println("ESP Now message sent with success #" + String(messagesSend));
+    Serial.println("ESP Now message sent with success #" + String(messagesSend) + " to " + String(TARGET_POD));
   } else {
     Serial.println("Error sending the data");
   }
@@ -72,6 +72,6 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   messagesReceived++;
   memcpy(&receivedData, incomingData, sizeof(receivedData));
-  Serial.print("---Received data #" + String(messagesReceived) + " for " + String(receivedData.target));
+  Serial.println("---Received data #" + String(messagesReceived) + " for " + String(receivedData.target));
   // printStructMessage(receivedData);
 }
