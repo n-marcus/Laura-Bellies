@@ -33,27 +33,25 @@ void setupESPNow() {
 
 // callback when data is sent
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  // Serial.print("\r\nLast Packet Send Status:\t");
-  // Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+  Serial.print("\r\nLast Packet Send Status:\t");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
 }
 
 void sendData() {
   //if this is pod a, send it to pod b and in reverse
-  // messageToSend.target = POD_IDENTIFIER == 'a' ? 'b' : 'a';
-  //send message to all with same identifier
-  messageToSend.target = POD_IDENTIFIER;
+  messageToSend.target = POD_IDENTIFIER == 'a' ? 'b' : 'a';
+
   messageToSend.heartbeatRate = 0;
   messageToSend.humanPresence = false;
   messageToSend.breathingsPerMinute = 0;
 
 
   //include whether this one is being touched or not
-  messageToSend.beingTouched = false;
+  messageToSend.beingTouched = beingTouched;
   //signal that this message is about being touched or not
-  messageToSend.isAboutTouch = false;
-
-  //get the current breathing cycle position
-  messageToSend.breathingPercentage = breathCyclePercentage;
+  messageToSend.isAboutTouch = true;
+  messageToSend.breathingPercentage = -1;
+  Serial.println("Sending message about touch being: " + String(messageToSend.beingTouched));
 
   // Serial.println("About to send message");
   // printStructMessage(messageToSend);
@@ -73,20 +71,20 @@ void sendData() {
 // callback function that will be executed when data is received
 void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   messagesReceived++;
-  // Serial.println("ESP Now hit!");
   memcpy(&receivedData, incomingData, sizeof(receivedData));
   bool targetIsMe = receivedData.target == POD_IDENTIFIER;
   Serial.print("---Received data #" + String(messagesReceived) + " for " + String(receivedData.target));
   if (targetIsMe) Serial.print(" which is me!");
   Serial.println("");
 
-  if (targetIsMe && receivedData.breathingsPerMinute == 0 && receivedData.humanPresence == 0 && receivedData.heartbeatRate == 0) {
+  if (targetIsMe && receivedData.breathingsPerMinute == 0 && receivedData.humanPresence == 0 && receivedData.heartbeatRate == 0 && receivedData.breathingPercentage == -1) {
     Serial.println("All readings are 0 and not about being touched");
     Serial.println(" ");
   } else if (targetIsMe) {
     //if everything was not 0
     Serial.print("breathingsPerMinute: " + String(receivedData.breathingsPerMinute));
     Serial.print(" Human presence: " + String(receivedData.humanPresence));
+    Serial.print(" Breathing percentage: " + String(receivedData.breathingPercentage));
     Serial.println(" Heartrate: " + String(receivedData.heartbeatRate));
     Serial.println(" ");
   }
@@ -96,9 +94,12 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
     if (receivedData.isAboutTouch) {
       Serial.println("Received info about other pod being touched " + String(receivedData.beingTouched));
 
-      //save whether the other pod is being touched localy 
+      //save whether the other pod is being touched localy
       setOtherPodTouched(receivedData.beingTouched);
-      
+
+    } else if (receivedData.breathingPercentage != -1) {
+      Serial.println("Received breathing percentage: " + String(receivedData.breathingPercentage));
+      breathCyclePercentage = receivedData.breathingPercentage;
     } else {
       //if this is not about being touched, but a message from the heartbeat sensor
       //save the received human presence
@@ -108,7 +109,6 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
       if (humanPresence == 1) {
         shouldBeBreathing = true;
       }
-
 
       //if there is a valid breath bpm detected, reflect in the bpm
       if (receivedData.breathingsPerMinute > 0) {
@@ -125,6 +125,7 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
         msPerBreathCycle = 60000 / breathingBPM;
       }
     }
+
   } else {
     Serial.println("Got message for different pod, namely: " + String(receivedData.target));
   }

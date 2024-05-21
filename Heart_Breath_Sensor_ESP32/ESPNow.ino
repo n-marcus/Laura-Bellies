@@ -47,6 +47,7 @@ void sendESPNowMessage() {
 
   //this node will never send anything about touch because it does not have a touch sensor
   messageToSend.isAboutTouch = false;
+  messageToSend.breathingPercentage = -1;
   printStructMessage(messageToSend);
   // Send message via ESP-NOW
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&messageToSend, sizeof(messageToSend));

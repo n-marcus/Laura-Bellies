@@ -12,23 +12,23 @@ LPFilter touchValueFilter;
 
 
 void setupTouch() {
-  // pinMode(TOUCH_PIN, INPUT);
+  pinMode(TOUCH_PIN, INPUT);
 
-  // float average = 0;
-  // int sum = 0;
-  // const int NUM_READINGS = 1000;
-  // for (int i = 0; i < NUM_READINGS; i++) {
-  //   //sum all the readings
-  //   sum += touchRead(TOUCH_PIN);
-  //   delay(1);
-  // }
+  float average = 0;
+  int sum = 0;
+  const int NUM_READINGS = 1000;
+  for (int i = 0; i < NUM_READINGS; i++) {
+    //sum all the readings
+    sum += touchRead(TOUCH_PIN);
+    delay(1);
+  }
 
-  // //calculate the average
-  // average = sum / float(NUM_READINGS);
+  //calculate the average
+  average = sum / float(NUM_READINGS);
 
-  // Serial.println("Touch average seems to be " + String(NUM_READINGS) + " = " + String(average));
-  // //save the value globally
-  // touchBaseLevel = average;
+  Serial.println("Touch average seems to be " + String(NUM_READINGS) + " = " + String(average));
+  //save the value globally
+  touchBaseLevel = average;
   //delay so we can read the serial
   // delay(2000);
 
@@ -38,40 +38,39 @@ void setupTouch() {
 
 void updateTouch() {
   // Read the touch sensor value
-  // touchValue = touchValueFilter.update(float(touchRead(TOUCH_PIN)), 0.75);
+  touchValue = touchValueFilter.update(float(touchRead(TOUCH_PIN)), 0.75);
 
+  if (touchValue < touchBaseLevel - touchThreshold) {
+    //  Serial.println("I am being touched!");
+    beingTouched = true;
+  } else {
+    beingTouched = false;
+  }
 
-  // if (touchValue < touchBaseLevel - touchThreshold) {
-  //   //  Serial.println("I am being touched!");
-  //   beingTouched = true;
-  // } else {
-  //   beingTouched = false;
-  // }
+  //if touch status changed, send out message to the other pod
+  if (beingTouched != _beingTouched) {
+    Serial.println("Being touched changed!");
+    sendData();
+  }
 
-  // //if touch status changed, send out message to the other pod
-  // if (beingTouched != _beingTouched) {
-  //   Serial.println("Being touched changed!");
-  //   sendData();
-  // }
-
-  // //keep track of change
-  // _beingTouched = beingTouched;
+  //keep track of change
+  _beingTouched = beingTouched;
   // setOtherPodTouched(beingTouched);
   // updateTouchMotors();
 }
 
 void setOtherPodTouched(bool receivedOtherPodIsTouched) {
   //check if the new value is actually different s
-  // if (receivedOtherPodIsTouched != otherPodIsTouched) {
-    Serial.println("Other pod touched changed to " + String(receivedOtherPodIsTouched));
+  if (receivedOtherPodIsTouched != otherPodIsTouched) {
+    Serial.println("Other pod touched changed to " + String(otherPodIsTouched));
     otherPodIsTouched = receivedOtherPodIsTouched;
-  // }
+  }
 }
 
 void updateTouchMotors() {
 
   if (otherPodIsTouched) {
-    Serial.println("Other pod is touched");
+    // Serial.println("Other pod is touched");
 
     if (otherPodBreathInLevel < maxOtherPodBreathInLevel) {
       otherPodBreathInLevel += 1;
@@ -85,7 +84,7 @@ void updateTouchMotors() {
       // Serial.println("Reached max");
     }
   } else if (otherPodIsTouched == 0) {
-    Serial.println("Other pod is not touched");
+    // Serial.println("Other pod is not touched");
     if (otherPodBreathInLevel > 0) {
       analogWrite(OTHERPOD_BREATHING_OUT_MOTOR, 255);
       analogWrite(OTHERPOD_BREATHING_IN_MOTOR, 0);

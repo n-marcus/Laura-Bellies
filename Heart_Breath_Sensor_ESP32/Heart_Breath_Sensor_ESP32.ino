@@ -35,6 +35,7 @@ typedef struct struct_message {
   int breathingsPerMinute;
   bool beingTouched;
   bool isAboutTouch;
+  float breathingPercentage;
 } struct_message;
 
 // Create a struct_message called myData

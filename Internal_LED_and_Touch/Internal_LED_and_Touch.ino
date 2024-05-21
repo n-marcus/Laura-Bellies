@@ -2,16 +2,14 @@
 #include <esp_now.h>
 #include <WiFi.h>
 #include "common.h"
+
 #include "LPFilter.hpp"
 
 
 //HERE YOU CAN EDIT STUFF LAURA
-
-//This is the default speed of breathing
-//best is somewhere between 2 and 40
 int breathingBPM = 5;
 int defaultBreathingBPMWithoutHumanDetected = 5;
-
+bool shouldBeBreathing = false;
 
 //This is the base position on the hue wheel (0.5 is a kind of blue)
 //see here https://learn.adafruit.com/assets/74094
@@ -25,13 +23,10 @@ int LEDminimumBrightness = 140;
 //lower values (between 0 and 1) make the brightness curve of the LEDs steeper
 float LEDPower = 0.4;
 
-float breathingDivision = 0.5;  //0.5 means breathing in and out is same length
-//0.6 means breathing in for 60% of the time, breathing out for 40%
-//0.4 means breathing in for 40% of the time, breathing out for 60% etc
 
 
 //This is the name of the pod so it listens to the correct messages
-#define POD_IDENTIFIER 'b'  //either 'a' or 'b'
+#define POD_IDENTIFIER 'a'  //either 'a' or 'b'
 //a is BLACK
 //b is RED
 
@@ -97,8 +92,6 @@ int _switchState = 0;
 //LED values
 float LEDBrightness = 0;
 
-elapsedMillis timeSinceESPNowSent;
-
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -107,10 +100,10 @@ void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
   showMacAdresses();
-  setupBreathing();
+  // setupBreathing();
   setupTouch();
-  setupSwitch();
-  // setupLED();
+  // setupSwitch();
+  setupLED();
   setupESPNow();
 
   showMacAdresses();
@@ -120,17 +113,11 @@ void setup() {
 
 void loop() {
 
-  updateBreathing();
-  // updateTouch();
-  updateTouchMotors();
-  updateSwitch();
-  // updateLED();
+  // updateBreathing();
+  updateTouch();
+  // updateSwitch();
+  updateLED();
 
-  //send data every 500 ms
-  if (timeSinceESPNowSent > 250) {
-    sendData();
-    timeSinceESPNowSent = 0;
-  }
   checkSerial();
 
   // printDebug();
