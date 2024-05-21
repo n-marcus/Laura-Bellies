@@ -25,7 +25,7 @@ void updateBreathing() {
     breathCycleSineWave = pow(breathCycleSineWave, 0.1);
 
     //check if we are breathing in or out based on which half of the breathCycle we are in
-    if (breathCyclePercentage < 0.5) {
+    if (breathCyclePercentage < breathingDivision) {
       //first half of the cycle
       // Serial.println("Breathing in " + String(timeSinceLastBreathCycleStart));
       breathingInMotorValue = breathCycleSineWave * 255.;

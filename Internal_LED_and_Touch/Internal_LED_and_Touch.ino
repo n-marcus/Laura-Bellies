@@ -2,7 +2,6 @@
 #include <esp_now.h>
 #include <WiFi.h>
 #include "common.h"
-
 #include "LPFilter.hpp"
 
 
@@ -26,7 +25,7 @@ float LEDPower = 0.4;
 
 
 //This is the name of the pod so it listens to the correct messages
-#define POD_IDENTIFIER 'a'  //either 'a' or 'b'
+#define POD_IDENTIFIER 'b'  //either 'a' or 'b'
 //a is BLACK
 //b is RED
 

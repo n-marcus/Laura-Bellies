@@ -10,7 +10,7 @@
 #define LED_PIN 18
 
 // How many NeoPixels are attached to the Arduino?
-#define LED_COUNT 10
+#define LED_COUNT 64
 
 int LEDHue = 0;
 int saturation = 180;

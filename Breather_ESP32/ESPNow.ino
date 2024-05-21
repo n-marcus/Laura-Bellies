@@ -64,7 +64,7 @@ void sendData() {
 
   if (result == ESP_OK) {
     messagesSend++;
-    Serial.println("ESP Now message sent with success #" + String(messagesSend));
+    // Serial.println("ESP Now message sent with success #" + String(messagesSend));
   } else {
     Serial.println("Error sending the data");
   }
@@ -76,9 +76,9 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   // Serial.println("ESP Now hit!");
   memcpy(&receivedData, incomingData, sizeof(receivedData));
   bool targetIsMe = receivedData.target == POD_IDENTIFIER;
-  Serial.print("---Received data #" + String(messagesReceived) + " for " + String(receivedData.target));
-  if (targetIsMe) Serial.print(" which is me!");
-  Serial.println("");
+  // Serial.print("---Received data #" + String(messagesReceived) + " for " + String(receivedData.target));
+  // if (targetIsMe) Serial.print(" which is me!");
+  // Serial.println("");
 
   if (targetIsMe && receivedData.breathingsPerMinute == 0 && receivedData.humanPresence == 0 && receivedData.heartbeatRate == 0) {
     Serial.println("All readings are 0 and not about being touched");
@@ -92,7 +92,6 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   }
 
   if (targetIsMe) {
-
     if (receivedData.isAboutTouch) {
       Serial.println("Received info about other pod being touched " + String(receivedData.beingTouched));
 
@@ -126,6 +125,6 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
       }
     }
   } else {
-    Serial.println("Got message for different pod, namely: " + String(receivedData.target));
+    // Serial.println("Got message for different pod, namely: " + String(receivedData.target));
   }
 }

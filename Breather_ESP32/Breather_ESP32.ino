@@ -25,7 +25,7 @@ int LEDminimumBrightness = 140;
 //lower values (between 0 and 1) make the brightness curve of the LEDs steeper
 float LEDPower = 0.4;
 
-float breathingDivision = 0.5;  //0.5 means breathing in and out is same length
+float breathingDivision = 0.6;  //0.5 means breathing in and out is same length
 //0.6 means breathing in for 60% of the time, breathing out for 40%
 //0.4 means breathing in for 40% of the time, breathing out for 60% etc
 
@@ -98,6 +98,7 @@ int _switchState = 0;
 float LEDBrightness = 0;
 
 elapsedMillis timeSinceESPNowSent;
+elapsedMillis timeSinceTouchMotorsUpdated;
 
 void setup() {
   // put your setup code here, to run once:
@@ -122,12 +123,15 @@ void loop() {
 
   updateBreathing();
   // updateTouch();
-  updateTouchMotors();
+  if (timeSinceTouchMotorsUpdated > 1) {
+    //make sure this doesnt get called more than once per ms
+    updateTouchMotors();
+  }
   updateSwitch();
   // updateLED();
 
   //send data every 500 ms
-  if (timeSinceESPNowSent > 250) {
+  if (timeSinceESPNowSent > 20) {
     sendData();
     timeSinceESPNowSent = 0;
   }
