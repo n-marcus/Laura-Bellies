@@ -25,6 +25,11 @@ int LEDminimumBrightness = 140;
 //lower values (between 0 and 1) make the brightness curve of the LEDs steeper
 float LEDPower = 0.4;
 
+
+//the percentage of breathing in and out (between 100 and 0)
+float breathingInAmplitude = 100.0;
+float breathingOutAmplitude = 80.0;
+
 float breathingDivision = 0.5;  //0.5 means breathing in and out is same length
 //0.6 means breathing in for 60% of the time, breathing out for 40%
 //0.4 means breathing in for 40% of the time, breathing out for 60% etc
