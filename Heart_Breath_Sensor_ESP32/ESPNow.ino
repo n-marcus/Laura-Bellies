@@ -71,8 +71,8 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 
 // callback function that will be executed when data is received
 void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
-  messagesReceived++;
-  memcpy(&receivedData, incomingData, sizeof(receivedData));
-  Serial.println("---Received data #" + String(messagesReceived) + " for " + String(receivedData.target));
+  // messagesReceived++;
+  // memcpy(&receivedData, incomingData, sizeof(receivedData));
+  // Serial.println("---Received data #" + String(messagesReceived) + " for " + String(receivedData.target));
   // printStructMessage(receivedData);
 }

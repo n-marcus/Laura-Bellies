@@ -43,8 +43,8 @@ void printDebug() {
     Serial.println("min:0.0,max:1.0,");
     Serial.print("Breath_cycle_percentage:" + String(breathCyclePercentage) + ",");
     // Serial.println("Sine:" + String(breathCycleSineWave));
-    Serial.print("Breathing_in_value:" + String(breathingInMotorValue / 255.) + ",");
-    Serial.print("Breathing_out_value:" + String(breathingOutMotorValue / 255.) + ",");
+    Serial.print("Breathing_in_value:" + String(breathingInMotorValueSmoothed ) + ",");
+    Serial.print("Breathing_out_value:" + String(breathingOutMotorValueSmoothed) + ",");
     Serial.print("Touch_threshold:" + String(float(touchBaseLevel - touchThreshold) / 100.) + ",");
     Serial.print("Touch_value:" + String(float(touchValue) / 100.));
     Serial.println("SwitchState:" + String(switchState));

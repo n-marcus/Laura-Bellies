@@ -5,11 +5,12 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   // Serial.println(len);
   // Serial.print("Char: ");
   // // Serial.println(myData.a);
-  Serial.println("Got message for pod " + String(myData.target));
+  // Serial.println("Got message for pod " + String(myData.target));
 
   if (myData.target == POD_IDENTIFIER) {
     //if this is for this pod, save the data locally 
-    Serial.print("Heartbeat rate = ");
+    Serial.println("");
+    Serial.print("Message is for me: Heartbeat rate = ");
     Serial.print(myData.heartbeatRate);                     // Print received heartbeat
     Serial.print(" with target " + String(myData.target));  // Print received heartbeat
     Serial.println();
@@ -21,7 +22,8 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
 
     humanPresence = myData.humanPresence;
   } else { 
-    Serial.println("Message for different pod, skipping!");
+    // Serial.println("Message for different pod, skipping!");
+    Serial.print(".");
   }
 }
 
