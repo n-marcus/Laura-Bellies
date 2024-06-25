@@ -74,6 +74,9 @@ void updateBreathing() {
   _breathingIn = breathingIn;
   breathingInMotorValueSmoothed = breathingInFilter.update(breathingInMotorValue, 0.9998);
   breathingOutMotorValueSmoothed = breathingOutFilter.update(breathingOutMotorValue, 0.9998);
-  analogWrite(BREATHING_OUT_MOTOR, breathingInMotorValueSmoothed * (breathingInAmplitude / 100.) * 255.);
-  analogWrite(BREATHING_IN_MOTOR, breathingOutMotorValueSmoothed * (breathingOutAmplitude / 100.) * 255.);
+
+  // breathingInMotorValueSmoothed = breathingInMotorValue;
+  // breathingOutMotorValueSmoothed = breathingOutMotorValue;
+  analogWrite(BREATHING_IN_MOTOR, breathingInMotorValueSmoothed * (breathingInAmplitude / 100.) * 255.);
+  analogWrite(BREATHING_OUT_MOTOR, breathingOutMotorValueSmoothed * (breathingOutAmplitude / 100.) * 255.);
 }
