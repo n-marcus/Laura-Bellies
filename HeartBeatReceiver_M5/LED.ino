@@ -34,5 +34,5 @@ void updateLEDs() {
   //   digitalWrite(RED_LED_PIN, HIGH);
   // }
   // fll_solid(leds, NUM_LEDS, CHSV(120, 255, ledBrightness));
-  FastLED.show();
+  // FastLED.show();
 }

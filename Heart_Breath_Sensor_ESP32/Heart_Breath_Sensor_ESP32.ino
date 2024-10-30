@@ -14,12 +14,14 @@ BreathHeart_60GHz radar = BreathHeart_60GHz(&Serial2);
 unsigned long delay_Intial = 0;
 const long delay_interval = 1000;
 unsigned long measure_Intial = 0;
-const long measure_interval = 500;
+const long measure_interval = 1000;
 int Human_pesence_pin = 27;
 int Human_presence;
 int Heart_rate_measure_button_pin = 26;
 
-#define TARGET_POD 'a'
+elapsedMillis timeSinceLastMessage;
+
+#define TARGET_POD 'b'
 //a is BLACK
 //b is RED
 
@@ -90,5 +92,10 @@ void loop() {
 
   // Serial.println("Heart_rate_monitoring_system_acitve");
   HR_BR();
-  delay(100);
+  // delay(100);
+
+  if (timeSinceLastMessage > 100) {
+
+    sendESPNowMessage();
+  }
 }

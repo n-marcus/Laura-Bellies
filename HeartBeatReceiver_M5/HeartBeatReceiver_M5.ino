@@ -23,7 +23,8 @@ bool humanPresence = true;
 int currentInterval = 0;
 
 #define POD_IDENTIFIER 'b'
-
+//a is BLACK
+//b is RED
 
 #define RED_LED_PIN 10
 
@@ -46,6 +47,6 @@ void setup() {
 void loop() {
   updateSound();
   updateLEDs();
-  checkSerial();
+  // checkSerial();
   M5.update();  // You can still call M5.update() if needed
 }

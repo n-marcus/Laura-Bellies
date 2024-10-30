@@ -76,7 +76,9 @@ bool InitI2SSpeakOrMic(int mode) {
 void playHeartbeatSound() {
   // Serial.println("portMAX_DELAY " + String(portMAX_DELAY));
   long startTime = millis();
-  Serial.println("-- Starting to play heartbeat sample now");
+  // if (Serial) {
+  //   Serial.println("-- Starting to play heartbeat sample now");
+  // }
   int startByte = 1000;  // Adjust the starting byte position
   // long numBytesToPlay = map(heartbeatRate, 60, 120, 914158, 5000);
   // numBytesToPlay = constrain(numBytesToPlay, 0, 914158 - 1000);
@@ -85,10 +87,13 @@ void playHeartbeatSound() {
   int sampleRate = 174;
 
   //convert the BPM into a ms length
-  Serial.println("Heartbeat rate = " + String(heartbeatRate));
   float desiredLengthMs = 60000 / int(heartbeatRate);
   currentInterval = desiredLengthMs;
-  Serial.println("Desired ms = " + String(60000 / int(heartbeatRate)));
+
+  if (Serial) {
+    Serial.println("Heartbeat rate = " + String(heartbeatRate));
+    Serial.println("Desired ms = " + String(60000 / int(heartbeatRate)));
+  }
 
   //convert the desired ms to a length in smaples
   int desiredLengthSamples = int(desiredLengthMs * sampleRate);
@@ -97,7 +102,7 @@ void playHeartbeatSound() {
   // numBytesToPlay = myData.heartbeatRate;
 
   // numBytesToPlay = numBytesToPlay - (myData.heartbeatRate * 10000);
-  Serial.println("Num bytes = " + String(numBytesToPlay));
+  // Serial.println("Num bytes = " + String(numBytesToPlay));
 
   // Calculate the number of samples to skip
   // int samplesToSkip = int(SAMPLE_RATE * (speedFactor - 1.0));
@@ -106,11 +111,13 @@ void playHeartbeatSound() {
   i2s_write(SPEAK_I2S_NUMBER, &audio_chocobo[startByte], numBytesToPlay, &bytes_written, portMAX_DELAY);
   long length = millis() - startTime;
 
-  Serial.println("");
-  Serial.println("--Playing the sound took " + String(length) + "ms");
-  // Serial.println("Samplerate seems to be " + String(numBytesToPlay / length));
-  Serial.println("BPM was: " + String(60000 / length));
-  Serial.println("");
+  if (Serial) {
+    Serial.println("");
+    Serial.println("--Playing the sound took " + String(length) + "ms");
+    // Serial.println("Samplerate seems to be " + String(numBytesToPlay / length));
+    Serial.println("BPM was: " + String(60000 / length));
+    Serial.println("");
+  }
 }
 
 void playHeartbeatSoundAtRate(float speedFactor) {
@@ -120,14 +127,14 @@ void playHeartbeatSoundAtRate(float speedFactor) {
 
   // Check if the newSize is within reasonable limits
   if (newSize <= 0 || newSize > originalSize) {
-    Serial.println("Invalid newSize");
+    // Serial.println("Invalid newSize");
     return;
   }
 
   // Create an intermediate buffer for interpolated samples
   int* interpolatedBuffer = new int[newSize];
 
-  Serial.println("Heap before stretching = " + String(ESP.getFreeHeap()));
+  // Serial.println("Heap before stretching = " + String(ESP.getFreeHeap()));
 
   // Generate interpolated samples and store them in the buffer
   for (int i = 0; i < newSize - 1; i++) {
@@ -136,7 +143,7 @@ void playHeartbeatSoundAtRate(float speedFactor) {
 
     // Check if the position is within the valid range
     if (pos < 0 || pos >= originalSize - 1) {
-      Serial.println("Invalid position");
+      // Serial.println("Invalid position");
       delete[] interpolatedBuffer;
       return;
     }
@@ -149,7 +156,7 @@ void playHeartbeatSoundAtRate(float speedFactor) {
     interpolatedBuffer[i] = int(audio_chocobo[intPos] * (1 - fracPos) + audio_chocobo[intPos + 1] * fracPos);
   }
 
-  Serial.println("Heap after stretching = " + String(ESP.getFreeHeap()));
+  // Serial.println("Heap after stretching = " + String(ESP.getFreeHeap()));
 
   // Write the entire interpolated buffer to I2S
   i2s_write(SPEAK_I2S_NUMBER, interpolatedBuffer, newSize * sizeof(int), &bytes_written, portMAX_DELAY);

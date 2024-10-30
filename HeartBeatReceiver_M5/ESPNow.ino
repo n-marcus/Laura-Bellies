@@ -8,22 +8,25 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   // Serial.println("Got message for pod " + String(myData.target));
 
   if (myData.target == POD_IDENTIFIER) {
-    //if this is for this pod, save the data locally 
-    Serial.println("");
-    Serial.print("Message is for me: Heartbeat rate = ");
-    Serial.print(myData.heartbeatRate);                     // Print received heartbeat
-    Serial.print(" with target " + String(myData.target));  // Print received heartbeat
-    Serial.println();
-
+    //if this is for this pod, save the data locally
+    if (Serial) {
+      Serial.println("");
+      Serial.print("Message is for me: Heartbeat rate = ");
+      Serial.print(myData.heartbeatRate);                     // Print received heartbeat
+      Serial.print(" with target " + String(myData.target));  // Print received heartbeat
+      Serial.println();
+    }
     if (myData.heartbeatRate > 0 && myData.heartbeatRate < 300) {
       //if we received a valid heartrate, save it locally
       heartbeatRate = myData.heartbeatRate;
     }
 
     humanPresence = myData.humanPresence;
-  } else { 
+  } else {
     // Serial.println("Message for different pod, skipping!");
-    Serial.print(".");
+    if (Serial) {
+      Serial.print(".");
+    }
   }
 }
 

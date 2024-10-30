@@ -1,7 +1,9 @@
 
 void Measure_Breath_Heart_rate() {
   radar.Breath_Heart();  //Breath and heartbeat information output
+  // Serial.println("Starting measuring...");
   if (radar.sensor_report != 0x00) {
+    Serial.println("Detected somethign");
     switch (radar.sensor_report) {
       case HEARTRATEVAL:
         Serial.print("Sensor monitored the current heart rate value is: ");
@@ -21,6 +23,9 @@ void Measure_Breath_Heart_rate() {
 
     //always send a new message if any data changed
     sendESPNowMessage();
+  } else {
+    Serial.print(".");
+    // Serial.println("No Data available");
   }
 }
 
@@ -44,6 +49,7 @@ void human_presence() {
 void HR_BR() {
   measure_Intial = millis();
   while ((millis() - measure_Intial) <= measure_interval) {
+
     Measure_Breath_Heart_rate();
   }
 }
