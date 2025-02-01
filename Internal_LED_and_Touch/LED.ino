@@ -16,6 +16,9 @@ int LEDHue = 0;
 int saturation = 180;
 float fadeInPercentage = 0.0;
 
+bool stressedState = false;
+bool excitedState = false;
+
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 void setupLED() {
@@ -27,6 +30,25 @@ void setupLED() {
 }
 
 void updateLED() {
+  
+  //LAURA, here you can change the BPMS that will trigger a certain state
+  int heartbeatRate = receivedData.heartbeatRate;
+  if (heartbeatRate > 80 && heartbeatRate < 100) { 
+
+    //this is the excited state
+    excitedState = true;
+    stressedState = false;
+  } else if (heartbeatRate > 100) { 
+    //this is the stressed state
+    excitedState = false;
+    stressedState = true;
+  } else { 
+    //this is default state
+    excitedState = false;
+    stressedState = false;
+  }
+
+
   if (humanPresence) {
       //show the led when there seems to be someone close to the sensor
     digitalWrite(LED_BUILTIN, HIGH);
@@ -41,7 +63,15 @@ void updateLED() {
       //make it a steeper sloper
       breathCycleSineWaveLED = pow(breathCycleSineWaveLED, LEDPower);
 
+      //pick the right hue for the current state standard hue
       float hue = defaultHue;
+      //if we are excited, pick the excited hue
+      if (excitedState) {
+        hue = excitedHue;
+      } else if (stressedState) {
+        //if we are stressed pick the stressed hue
+        hue = stressedHue;
+      }
       //make the hue change over time
       hue += (breathCycleSineWaveLED * hueRange);
 
@@ -57,8 +87,6 @@ void updateLED() {
 
       //make sure the LEDs never fully turn off by setting a minimum of 10 for the brightness
       LEDBrightness = constrain(LEDBrightness, LEDminimumBrightness, 255);
-
-
 
       //calculate an LED color
       uint32_t rgbcolor = strip.ColorHSV(LEDHue, saturation, LEDBrightness * fadeInPercentage);

@@ -13,6 +13,9 @@ bool shouldBeBreathing = false;
 //This is the base position on the hue wheel (0.5 is a kind of blue)
 //see here https://learn.adafruit.com/assets/74094
 float defaultHue = 0.5;
+float excitedHue = 0.7;
+float stressedHue = 0.9;
+
 //Hue range is the amount of hue it goes up every breathing cycle
 //(hue + hueRange cannot be more than 1 otherwise, I dont know what will happen)
 float hueRange = 0.2;
