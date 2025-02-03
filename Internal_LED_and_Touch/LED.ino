@@ -32,11 +32,11 @@ void setupLED() {
 void updateLED() {
 
   //LAURA, here you can change the BPMS that will trigger a certain state
-  String state = "neutral";
   int heartbeatRate = receivedData.heartbeatRate;
   if (heartbeatRate != 0) {
+    //ignore when heartbeat is 0
+    String state = "neutral";
     if (heartbeatRate > 80 && heartbeatRate < 100) {
-
       //this is the excited state
       excitedState = true;
       stressedState = false;
@@ -51,10 +51,10 @@ void updateLED() {
       excitedState = false;
       stressedState = false;
     }
+    Serial.println("State is " + String(state) + " because heartbeat is " + String(receivedData.heartbeatRate));
   }
 
 
-  Serial.println("State is " + String(state) + " because heartbeat is " + String(receivedData.heartbeatRate));
 
   if (humanPresence) {
     //show the led when there seems to be someone close to the sensor
