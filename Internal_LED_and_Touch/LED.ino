@@ -81,7 +81,10 @@ void updateLED() {
       hue += (breathCycleSineWaveLED * hueRange);
 
       //make sure it wraps back to 0 if it overflows
-      hue = hue % float(1.0);
+      // hue = hue % float(1.0);
+      if (hue > float(1.0)) { 
+        hue = hue - 1.0;
+      }
 
       if (i == 0) {
         Serial.println("Hue is " + String(hue));
