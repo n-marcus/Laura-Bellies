@@ -34,21 +34,23 @@ void updateLED() {
   //LAURA, here you can change the BPMS that will trigger a certain state
   String state = "neutral";
   int heartbeatRate = receivedData.heartbeatRate;
-  if (heartbeatRate > 80 && heartbeatRate < 100) {
+  if (heartbeatRate != 0) {
+    if (heartbeatRate > 80 && heartbeatRate < 100) {
 
-    //this is the excited state
-    excitedState = true;
-    stressedState = false;
-    state = "excited";
-  } else if (heartbeatRate > 100) {
-    //this is the stressed state
-    excitedState = false;
-    stressedState = true;
-    state = "stressed";
-  } else {
-    //this is default state
-    excitedState = false;
-    stressedState = false;
+      //this is the excited state
+      excitedState = true;
+      stressedState = false;
+      state = "excited";
+    } else if (heartbeatRate > 100) {
+      //this is the stressed state
+      excitedState = false;
+      stressedState = true;
+      state = "stressed";
+    } else {
+      //this is default state
+      excitedState = false;
+      stressedState = false;
+    }
   }
 
 
@@ -82,7 +84,7 @@ void updateLED() {
 
       //make sure it wraps back to 0 if it overflows
       // hue = hue % float(1.0);
-      if (hue > float(1.0)) { 
+      if (hue > float(1.0)) {
         hue = hue - 1.0;
       }
 
