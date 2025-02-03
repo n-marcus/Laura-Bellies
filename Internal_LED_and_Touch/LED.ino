@@ -54,7 +54,7 @@ void updateLED() {
 
   Serial.println("State is " + String(state) + " because heartbeat is " + String(receivedData.heartbeatRate));
 
-    if (humanPresence) {
+  if (humanPresence) {
     //show the led when there seems to be someone close to the sensor
     digitalWrite(LED_BUILTIN, HIGH);
     fadeInPercentage = constrain(fadeInPercentage + 0.01, 0.0, 1.0);
@@ -81,7 +81,11 @@ void updateLED() {
       hue += (breathCycleSineWaveLED * hueRange);
 
       //make sure it wraps back to 0 if it overflows
-      hue = hue % 1.0;
+      hue = hue % float(1.0);
+
+      if (i == 0) {
+        Serial.println("Hue is " + String(hue));
+      }
 
       //convert the floating hue to a hue value on the hue wheel
       LEDHue = int(float(hueWheelSize) * hue);
@@ -104,9 +108,8 @@ void updateLED() {
       strip.show();  //  Update strip to match
     }
 
-    Serial.println("Hue is " + String(hue));
-  }
-  else {
+
+  } else {
     digitalWrite(LED_BUILTIN, LOW);
     //slowly fade the LED strip out
     LEDBrightness -= 0.1;
