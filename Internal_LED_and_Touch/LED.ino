@@ -52,7 +52,7 @@ void updateLED() {
   }
 
 
-  Serial.println("State is " + String(state));
+  Serial.println("State is " + String(state) + " because heartbeat is " + String(receivedData.heartbeatRate));
 
     if (humanPresence) {
     //show the led when there seems to be someone close to the sensor
