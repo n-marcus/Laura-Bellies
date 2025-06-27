@@ -1,9 +1,13 @@
+#include "esp_task_wdt.h"
 #include <esp_now.h>
 #include <WiFi.h>
 #include <Stepper.h>
 
 // === Force Sensor ===
 #define FORCE_SENSOR_PIN 36
+
+// built in led
+#define LED_PIN 2
 
 // === Motor 1 (Local) ===
 #define MOTOR1IN1 13
@@ -26,14 +30,21 @@ const int stepsFor5Seconds = 853;
 const int stepsFor6Seconds = 1024;
 const int stepsFor7Seconds = 1195;
 
+//Laura this is where you can control how much it goes backwards
+const int backwardsStepsOffset = 16;
+
 Stepper myStepper1(stepsPerRevolution, MOTOR1IN1, MOTOR1IN3, MOTOR1IN2, MOTOR1IN4);
 Stepper myStepper2(stepsPerRevolution, MOTOR2IN1, MOTOR2IN3, MOTOR2IN2, MOTOR2IN4);
 
 // === ESP-NOW ===
 // CHANGE THIS to your peer's MAC address
-uint8_t peerMAC[] = { 0x48, 0xE7, 0x29, 0xAD, 0x16, 0x00 };
+// uint8_t peerMAC[] = {0xCC, 0xDB, 0xA7, 0x3F, 0x9C, 0x14}; //if you're sending to BLACK
+uint8_t peerMAC[] = {0x48, 0xE7, 0x29, 0xAD, 0x16, 0x00}; //if you're sending to RED
 //{0xCC, 0xDB, 0xA7, 0x3F, 0x9C, 0x14}; // BLACK
 //RED address is: {0x48, 0xE7, 0x29, 0xAD, 0x16, 0x00}
+
+
+bool motorIsTurning = false;
 
 typedef struct struct_message {
   int forceValue;
@@ -71,6 +82,12 @@ void setup() {
   esp_now_register_send_cb(OnDataSent);
   // esp_now_register_recv_cb(OnDataRecv);  // Uses updated function signature
   esp_now_register_recv_cb(reinterpret_cast<esp_now_recv_cb_t>(OnDataRecv));
+
+  pinMode(LED_PIN, OUTPUT);
+  //test built in led
+  digitalWrite(LED_PIN, HIGH);
+  delay(100);
+  digitalWrite(LED_PIN, LOW);
   delay(1000);
 }
 
@@ -150,13 +167,18 @@ void loop() {
   myData.forceValue = localForce;
 
   // Send value
-  esp_now_send(peerMAC, (uint8_t *)&myData, sizeof(myData));
+  if (!motorIsTurning) {
+    //only send if we are not turning the motor
+    esp_now_send(peerMAC, (uint8_t *)&myData, sizeof(myData));
 
-  // Handle local motor
-  Serial.println("----");
-  Serial.print("Measured local force: ");
-  Serial.println(localForce);
-  handleMotor1(localForce);
+    // Handle local motor
+    Serial.println("----");
+    Serial.print("Measured local force: ");
+    Serial.println(localForce);
+    handleMotor1(localForce);
+  }
+
+
 
   delay(500);  // Keep it modest to avoid flooding
 }
@@ -170,6 +192,11 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 // Updated callback with correct signature
 void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   // Correct memcpy usage: copy raw bytes into the struct
+  if (motorIsTurning) {
+    //if the motor is already turning, disregard this
+    Serial.println("Got ESPNow message while the motor was turning, disregarding");
+    return;
+  }
   memcpy(&myData, incomingData, sizeof(myData));
   int remoteForce = myData.forceValue;
   Serial.print("Received remote force: ");
@@ -179,12 +206,19 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
 
 // General shock handler
 void DoShock(Stepper &motor, int steps, String motorName, String shockName) {
+  motorIsTurning = true;
+  digitalWrite(LED_PIN, HIGH);
+  // disableWDT();
+
   Serial.println("Starting " + shockName + " on " + motorName + " with " + String(abs(steps)) + " steps");
   SafeStep(motor, steps);
   delay(50);
-  SafeStep(motor, -steps);
+  SafeStep(motor, -(steps + backwardsStepsOffset ));  //make it go back one more to make sure it always turns off
   delay(100);
   Serial.println("Finished " + shockName + " on " + motorName);
+  motorIsTurning = false;
+  // enableWDT();
+  digitalWrite(LED_PIN, HIGH);
 }
 
 
@@ -192,11 +226,25 @@ void SafeStep(Stepper &stepper, int totalSteps) {
   const int chunkSize = 50;  // smaller chunk sizes help responsiveness
   int stepsLeft = abs(totalSteps);
   int direction = (totalSteps >= 0) ? 1 : -1;
+  Serial.println("Im going to move " + String(totalSteps) + " which might take a while...");
+  Serial.println("But no worries as I will be yielding every now and then");
 
   while (stepsLeft > 0) {
     int stepNow = (stepsLeft > chunkSize) ? chunkSize : stepsLeft;
     stepper.step(stepNow * direction);
     stepsLeft -= stepNow;
-    yield();  // Let system breathe here
+    yield();               // Let system breathe here
+    esp_task_wdt_reset();  // Explicitly feed watchdog
+    delay(1);
   }
+}
+
+
+
+void disableWDT() {
+  esp_task_wdt_delete(NULL);  // Unregister current task
+}
+
+void enableWDT() {
+  esp_task_wdt_add(NULL);  // Re-register current task
 }

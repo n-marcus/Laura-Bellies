@@ -13,6 +13,7 @@
 #define LED_COUNT 64  // 64 if big sculpture or 30 if small one
 
 int LEDHue = 0;
+LPFilter hueFilter;
 int saturation = 180;
 float fadeInPercentage = 0.0;
 
@@ -36,12 +37,12 @@ void updateLED() {
   if (heartbeatRate != 0) {
     //ignore when heartbeat is 0
     String state = "neutral";
-    if (heartbeatRate > 80 && heartbeatRate < 90) {
+    if (heartbeatRate > 80 && heartbeatRate < 100) {
       //this is the excited state
       excitedState = true;
       stressedState = false;
       state = "excited";
-    } else if (heartbeatRate > 90) {
+    } else if (heartbeatRate > 100) {
       //this is the stressed state
       excitedState = false;
       stressedState = true;
@@ -61,6 +62,21 @@ void updateLED() {
     digitalWrite(LED_BUILTIN, HIGH);
     fadeInPercentage = constrain(fadeInPercentage + 0.01, 0.0, 1.0);
     // Serial.println("FadeInPercentage:" + String(fadeInPercentage));
+
+    //pick the right hue for the current state standard hue
+    float hue = defaultHue;
+    //if we are excited, pick the excited hue
+    if (excitedState) {
+      hue = excitedHue;
+    } else if (stressedState) {
+      //if we are stressed pick the stressed hue
+      hue = stressedHue;
+    }
+
+    //smooth the hue so it doesnt change so dramatically
+    float filteredHue = hueFilter->update(hue,0.998);
+
+    
     for (int i = 0; i < strip.numPixels(); i++) {  // For each pixel in strip...
       int hueWheelSize = 65536;
 
@@ -70,30 +86,23 @@ void updateLED() {
       //make it a steeper sloper
       breathCycleSineWaveLED = pow(breathCycleSineWaveLED, LEDPower);
 
-      //pick the right hue for the current state standard hue
-      float hue = defaultHue;
-      //if we are excited, pick the excited hue
-      if (excitedState) {
-        hue = excitedHue;
-      } else if (stressedState) {
-        //if we are stressed pick the stressed hue
-        hue = stressedHue;
-      }
+
       //make the hue change over time
-      hue += (breathCycleSineWaveLED * hueRange);
+      filteredHue += (breathCycleSineWaveLED * hueRange);
 
       //make sure it wraps back to 0 if it overflows
       // hue = hue % float(1.0);
-      if (hue > float(1.0)) {
-        hue = hue - 1.0;
+      if (filteredHue > float(1.0)) {
+        filteredHue = filteredHue - 1.0;
       }
 
       if (i == 0) {
-        Serial.println("Hue is " + String(hue));
+        Serial.print("Hue is " + String(hue) + " ");
+        Serial.println("filtered hue is " + String(filteredHue) + " difference is " + String(hue - filteredHue));
       }
 
       //convert the floating hue to a hue value on the hue wheel
-      LEDHue = int(float(hueWheelSize) * hue);
+      LEDHue = int(float(hueWheelSize) * filteredHue);
 
       //convert it to LED values
       LEDBrightness = breathCycleSineWaveLED * 255.;

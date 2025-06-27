@@ -19,7 +19,8 @@ void checkSerial() {
           // Perform action based on the received value
           // For example, you can control an LED brightness
           Serial.println("Got " + String(receivedValue) + " from serial, saving as heartbeatrate");
-          breathingBPM = receivedValue;
+          // breathingBPM = receivedValue;
+           receivedData.heartbeatRate = receivedValue;
           msPerBreathCycle = 60000 / breathingBPM;
           // analogWrite(LED_BUILTIN, map(receivedValue, 0, 200, 0, 255));
         } else {
