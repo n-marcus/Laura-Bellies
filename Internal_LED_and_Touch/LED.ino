@@ -10,7 +10,7 @@
 #define LED_PIN 18
 
 // How many NeoPixels are attached to the Arduino?
-#define LED_COUNT 64 // 64 if big sculpture or 30 if small one
+#define LED_COUNT 64  // 64 if big sculpture or 30 if small one
 
 int LEDHue = 0;
 int saturation = 180;
@@ -34,14 +34,9 @@ void updateLED() {
   //LAURA, here you can change the BPMS that will trigger a certain state
   int heartbeatRate = receivedData.heartbeatRate;
   if (heartbeatRate != 0) {
-<<<<<<< Updated upstream
     //ignore when heartbeat is 0
     String state = "neutral";
-    if (heartbeatRate > 80 && heartbeatRate < 100) {
-=======
     if (heartbeatRate > 80 && heartbeatRate < 90) {
-
->>>>>>> Stashed changes
       //this is the excited state
       excitedState = true;
       stressedState = false;
