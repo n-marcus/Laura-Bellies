@@ -15,13 +15,13 @@ void checkSerial() {
         int receivedValue = atoi(buffer);  // Convert the string to an integer
 
         // Check if the received value is within the valid range (0 to 200)
-        if (receivedValue >= 0 && receivedValue < 50) {
+        if (receivedValue >= 0 && receivedValue < 200) {
           // Perform action based on the received value
           // For example, you can control an LED brightness
           Serial.println("Got " + String(receivedValue) + " from serial, saving as heartbeatrate");
           // breathingBPM = receivedValue;
-           receivedData.heartbeatRate = receivedValue;
-          msPerBreathCycle = 60000 / breathingBPM;
+          receivedData.heartbeatRate = receivedValue;
+          // msPerBreathCycle = 60000 / breathingBPM;
           // analogWrite(LED_BUILTIN, map(receivedValue, 0, 200, 0, 255));
         } else {
           // Invalid value received, handle it as needed
@@ -41,13 +41,14 @@ void printDebug() {
 
   //print some debugging info
   // if (cycleCount % 2000 == 0) {
-    Serial.println("min:0.0,max:1.0,");
-    Serial.print("Breath_cycle_percentage:" + String(breathCyclePercentage) + ",");
-    // Serial.println("Sine:" + String(breathCycleSineWave));
-    Serial.print("Breathing_in_value:" + String(breathingInMotorValue / 255.) + ",");
-    Serial.print("Breathing_out_value:" + String(breathingOutMotorValue / 255.) + ",");
-    Serial.print("Touch_threshold:" + String(float(touchBaseLevel - touchThreshold) / 100.) + ",");
-    Serial.print("Touch_value:" + String(float(touchValue) / 100.));
-    Serial.println("SwitchState:" + String(switchState));
+  Serial.println("min:0.0,max:1.0,");
+  Serial.print("Breath_cycle_percentage:" + String(breathCyclePercentage) + ",");
+  // Serial.println("Sine:" + String(breathCycleSineWave));
+  Serial.print("Breathing_in_value:" + String(breathingInMotorValue / 255.) + ",");
+  Serial.print("Breathing_out_value:" + String(breathingOutMotorValue / 255.) + ",");
+  Serial.print("Touch_threshold:" + String(float(touchBaseLevel - touchThreshold) / 100.) + ",");
+  Serial.print("Touch_value:" + String(float(touchValue) / 100.));
+  // Serial.print("Heartrate ")
+  Serial.println("SwitchState:" + String(switchState));
   // }
 }

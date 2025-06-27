@@ -183,8 +183,7 @@ void loop() {
   delay(500);  // Keep it modest to avoid flooding
 }
 
-// === ESP-NOW Callbacks ===
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+void OnDataSent(const wifi_tx_info_t* info, esp_now_send_status_t status) {
   Serial.print("Send Status: ");
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Success" : "Fail");
 }

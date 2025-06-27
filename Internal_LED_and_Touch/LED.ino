@@ -17,6 +17,10 @@ LPFilter hueFilter;
 int saturation = 180;
 float fadeInPercentage = 0.0;
 
+
+//this smooths the hue over time, the closer this value is to 1, the slower it will go. Never make it over 1, it will create a disco show
+float hueSmoothingValue = 0.98;
+
 bool stressedState = false;
 bool excitedState = false;
 
@@ -42,7 +46,7 @@ void updateLED() {
       excitedState = true;
       stressedState = false;
       state = "excited";
-    } else if (heartbeatRate > 100) {
+    } else if (heartbeatRate >= 100) {
       //this is the stressed state
       excitedState = false;
       stressedState = true;
@@ -53,6 +57,8 @@ void updateLED() {
       stressedState = false;
     }
     Serial.println("State is " + String(state) + " because heartbeat is " + String(receivedData.heartbeatRate));
+  } else {
+    // Serial.println("Hearrate is 0");
   }
 
 
@@ -74,53 +80,51 @@ void updateLED() {
     }
 
     //smooth the hue so it doesnt change so dramatically
-    float filteredHue = hueFilter->update(hue,0.998);
-
-    
-    for (int i = 0; i < strip.numPixels(); i++) {  // For each pixel in strip...
-      int hueWheelSize = 65536;
-
-      saturation = 180;
-      //the whole animation depends on the breathCyclePercentage value
-      float breathCycleSineWaveLED = abs(sin(breathCyclePercentage * TWO_PI));
-      //make it a steeper sloper
-      breathCycleSineWaveLED = pow(breathCycleSineWaveLED, LEDPower);
+    float filteredHue = hueFilter.update(hue, hueSmoothingValue);
 
 
-      //make the hue change over time
-      filteredHue += (breathCycleSineWaveLED * hueRange);
+    // for (int i = 0; i < strip.numPixels(); i++) {  // For each pixel in strip...
+    int hueWheelSize = 65536;
 
-      //make sure it wraps back to 0 if it overflows
-      // hue = hue % float(1.0);
-      if (filteredHue > float(1.0)) {
-        filteredHue = filteredHue - 1.0;
-      }
-
-      if (i == 0) {
-        Serial.print("Hue is " + String(hue) + " ");
-        Serial.println("filtered hue is " + String(filteredHue) + " difference is " + String(hue - filteredHue));
-      }
-
-      //convert the floating hue to a hue value on the hue wheel
-      LEDHue = int(float(hueWheelSize) * filteredHue);
-
-      //convert it to LED values
-      LEDBrightness = breathCycleSineWaveLED * 255.;
-
-      //slowly fade the LEDs in when we detect a human again
-      // LEDBrightness = LEDBrightness * fadeInPercentage;
+    saturation = 180;
+    //the whole animation depends on the breathCyclePercentage value
+    float breathCycleSineWaveLED = abs(sin(breathCyclePercentage * TWO_PI));
+    //make it a steeper sloper
+    breathCycleSineWaveLED = pow(breathCycleSineWaveLED, LEDPower);
 
 
-      //make sure the LEDs never fully turn off by setting a minimum of 10 for the brightness
-      LEDBrightness = constrain(LEDBrightness, LEDminimumBrightness, 255);
+    //make the hue change over time
+    filteredHue += (breathCycleSineWaveLED * hueRange);
 
-      //calculate an LED color
-      uint32_t rgbcolor = strip.ColorHSV(LEDHue, saturation, LEDBrightness * fadeInPercentage);
-
-      //fill the strip with it
-      strip.fill(rgbcolor);
-      strip.show();  //  Update strip to match
+    //make sure it wraps back to 0 if it overflows
+    // hue = hue % float(1.0);
+    if (filteredHue > float(1.0)) {
+      filteredHue = filteredHue - 1.0;
     }
+
+    // Serial.print("Hue is " + String(hue) + " ");
+    // Serial.println("filtered hue is " + String(filteredHue) + " difference is " + String(hue - filteredHue));
+
+
+    //convert the floating hue to a hue value on the hue wheel
+    LEDHue = int(float(hueWheelSize) * filteredHue);
+
+    //convert it to LED values
+    LEDBrightness = breathCycleSineWaveLED * 255.;
+
+    //slowly fade the LEDs in when we detect a human again
+    // LEDBrightness = LEDBrightness * fadeInPercentage;
+
+
+    //make sure the LEDs never fully turn off by setting a minimum of 10 for the brightness
+    LEDBrightness = constrain(LEDBrightness, LEDminimumBrightness, 255);
+
+    //calculate an LED color
+    uint32_t rgbcolor = strip.ColorHSV(LEDHue, saturation, LEDBrightness * fadeInPercentage);
+    // }
+    //fill the strip with it
+    strip.fill(rgbcolor);
+    strip.show();  //  Update strip to match
 
 
   } else {
