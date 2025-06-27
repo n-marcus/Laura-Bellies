@@ -28,7 +28,7 @@ float LEDPower = 0.4;
 
 //the percentage of breathing in and out (between 100 and 0)
 float breathingInAmplitude = 100.0;
-float breathingOutAmplitude = 80.0;
+float breathingOutAmplitude = 85.0;
 
 float breathingDivision = 0.5;  //0.5 means breathing in and out is same length
 //0.6 means breathing in for 60% of the time, breathing out for 40%

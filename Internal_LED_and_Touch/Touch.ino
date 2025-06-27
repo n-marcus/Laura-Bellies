@@ -1,4 +1,4 @@
-#define TOUCH_PIN 4
+#define TOUCH_PIN 4 // 4 (usually) or 2 
 #define OTHERPOD_BREATHING_IN_MOTOR 19
 #define OTHERPOD_BREATHING_OUT_MOTOR 21
 

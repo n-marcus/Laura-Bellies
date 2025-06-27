@@ -6,7 +6,7 @@
 bool otherPodIsTouched = false;
 bool otherPodBreathingDir = 0;       //1 is breathe in, 0 is neutral, -1 is breathe out
 int otherPodBreathInLevel = 0;       //how far have we approximately breathed in the other pod touched lung
-int maxOtherPodBreathInLevel = 10000;  //how far can we breathe in before breathing out again
+int maxOtherPodBreathInLevel = 20000;  //how far can we breathe in before breathing out again, 10000 for big sculpture, 4000 for small one
 
 LPFilter touchValueFilter;
 
