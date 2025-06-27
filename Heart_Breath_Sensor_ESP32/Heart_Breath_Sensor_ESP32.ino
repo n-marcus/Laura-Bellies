@@ -95,7 +95,6 @@ void loop() {
   // delay(100);
 
   if (timeSinceLastMessage > 100) {
-
     sendESPNowMessage();
   }
 }

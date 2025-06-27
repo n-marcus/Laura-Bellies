@@ -31,7 +31,7 @@ Stepper myStepper2(stepsPerRevolution, MOTOR2IN1, MOTOR2IN3, MOTOR2IN2, MOTOR2IN
 
 // === ESP-NOW ===
 // CHANGE THIS to your peer's MAC address
-uint8_t peerMAC[] = {0x48, 0xE7, 0x29, 0xAD, 0x16, 0x00};
+uint8_t peerMAC[] = { 0x48, 0xE7, 0x29, 0xAD, 0x16, 0x00 };
 //{0xCC, 0xDB, 0xA7, 0x3F, 0x9C, 0x14}; // BLACK
 //RED address is: {0x48, 0xE7, 0x29, 0xAD, 0x16, 0x00}
 
@@ -69,26 +69,79 @@ void setup() {
   }
 
   esp_now_register_send_cb(OnDataSent);
-  esp_now_register_recv_cb(OnDataRecv);  // Uses updated function signature
+  // esp_now_register_recv_cb(OnDataRecv);  // Uses updated function signature
+  esp_now_register_recv_cb(reinterpret_cast<esp_now_recv_cb_t>(OnDataRecv));
+  delay(1000);
 }
 
 // === Motor Behavior ===
 void handleMotor1(int value) {
-  if (value < 1000) return;
-  //else if (value < 600) AwarenessShock1();
-  //else if (value < 1000) SoftShock1();
-  else if (value < 1500) MediumShock1();
-  else if (value < 2000) HardShock1();
-  else IntenseShock1();
+  Serial.println("Start handling motor 1 with value " + String(value));
+
+  if (value < 1000) {
+    // ignore values under 1000
+    Serial.println("Value " + String(value) + " is below 1000 — no shock applied.");
+    return;
+  }
+
+  // Uncomment and adjust these if needed:
+  // if (value < 600) {
+  //   Serial.println("Value " + String(value) + " — triggering AwarenessShock1()");
+  //   AwarenessShock1();
+  // } else if (value < 1000) {
+  //   Serial.println("Value " + String(value) + " — triggering SoftShock1()");
+  //   SoftShock1();
+  // }
+
+  else if (value < 1500) {
+    // between 1000 and 1500
+    Serial.println("Value " + String(value) + " — triggering MediumShock");
+    DoShock(myStepper1, stepsFor5Seconds, "motor1", "MediumShock");
+  } else if (value < 2000) {
+    // between 1500 & 2000
+    Serial.println("Value " + String(value) + " — triggering Hardshock");
+    DoShock(myStepper1, stepsFor6Seconds, "motor1", "HardShock");
+  } else {
+    // anything above 2000
+    Serial.println("Value " + String(value) + " — triggering IntenseShock1()");
+    DoShock(myStepper1, stepsFor7Seconds, "motor1", "IntenseShock");
+  }
+
+  Serial.println("Done handling motor 1");
 }
 
+
 void handleMotor2(int value) {
-  if (value < 1000) return;
-  //else if (value < 600) AwarenessShock2();
-  //else if (value < 1000) SoftShock2();
-  else if (value < 1500) MediumShock2();
-  else if (value < 2000) HardShock2();
-  else IntenseShock2();
+  Serial.println("Start handling motor 2 with value " + String(value));
+  if (value < 1000) {
+    // ignore values under 1000
+    Serial.println("Value " + String(value) + " is below 1000 — no shock applied.");
+    return;
+  }
+
+  // Uncomment and adjust these if needed:
+  // if (value < 600) {
+  //   Serial.println("Value " + String(value) + " — triggering AwarenessShock2()");
+  //   AwarenessShock2();
+  // } else if (value < 1000) {
+  //   Serial.println("Value " + String(value) + " — triggering SoftShock2()");
+  //   SoftShock2();
+  // }
+
+  else if (value < 1500) {
+    // between 1000 and 1500
+    Serial.println("Value " + String(value) + " — triggering MediumShock");
+    DoShock(myStepper2, stepsFor5Seconds, "motor2", "MediumShock");
+  } else if (value < 2000) {
+    // between 1500 & 2000
+    Serial.println("Value " + String(value) + " — triggering Hardshock");
+    DoShock(myStepper2, stepsFor6Seconds, "motor2", "HardShock");
+  } else {
+    // anything above 2000
+    Serial.println("Value " + String(value) + " — triggering IntenseShock1()");
+    DoShock(myStepper2, stepsFor7Seconds, "motor2", "IntenseShock");
+  }
+  Serial.println("Done handling motor 2");
 }
 
 // === Loop ===
@@ -100,11 +153,12 @@ void loop() {
   esp_now_send(peerMAC, (uint8_t *)&myData, sizeof(myData));
 
   // Handle local motor
-  Serial.print("Local force: ");
+  Serial.println("----");
+  Serial.print("Measured local force: ");
   Serial.println(localForce);
   handleMotor1(localForce);
 
-  delay(500); // Keep it modest to avoid flooding
+  delay(500);  // Keep it modest to avoid flooding
 }
 
 // === ESP-NOW Callbacks ===
@@ -114,123 +168,35 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 }
 
 // Updated callback with correct signature
-void OnDataRecv(const esp_now_recv_info_t *info, const uint8_t *data, int len) {
-  memcpy(&incomingData, data, sizeof(incomingData));
-  int remoteForce = incomingData.forceValue;
-  Serial.print("Remote force: ");
+void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
+  // Correct memcpy usage: copy raw bytes into the struct
+  memcpy(&myData, incomingData, sizeof(myData));
+  int remoteForce = myData.forceValue;
+  Serial.print("Received remote force: ");
   Serial.println(remoteForce);
   handleMotor2(remoteForce);
 }
 
-void TickleShock1() {
-  // step for 2 seconds in one direction:
-  myStepper1.step(stepsFor2Seconds);
+// General shock handler
+void DoShock(Stepper &motor, int steps, String motorName, String shockName) {
+  Serial.println("Starting " + shockName + " on " + motorName + " with " + String(abs(steps)) + " steps");
+  SafeStep(motor, steps);
   delay(50);
-  // step for 2 seconds in the other direction:
-  myStepper1.step(-stepsFor2Seconds);
+  SafeStep(motor, -steps);
   delay(100);
- } 
-
-void TickleShock2() {
-  // step for 2 seconds in one direction:
-  myStepper2.step(stepsFor2Seconds);
-  delay(50);
-  // step for 2 seconds in the other direction:
-  myStepper2.step(-stepsFor2Seconds);
-  delay(100);
- } 
-
-void AwarenessShock1() {
-  // step for 3 seconds in one direction:
-  myStepper1.step(stepsFor3Seconds);
-  delay(50);
-  // step for 3 seconds in the other direction:
-  myStepper1.step(-stepsFor3Seconds);
-  delay(100);
+  Serial.println("Finished " + shockName + " on " + motorName);
 }
 
-void AwarenessShock2() {
-  // step for 3 seconds in one direction:
-  myStepper2.step(stepsFor3Seconds);
-  delay(50);
-  // step for 3 seconds in the other direction:
-  myStepper2.step(-stepsFor3Seconds);
-  delay(100);
+
+void SafeStep(Stepper &stepper, int totalSteps) {
+  const int chunkSize = 50;  // smaller chunk sizes help responsiveness
+  int stepsLeft = abs(totalSteps);
+  int direction = (totalSteps >= 0) ? 1 : -1;
+
+  while (stepsLeft > 0) {
+    int stepNow = (stepsLeft > chunkSize) ? chunkSize : stepsLeft;
+    stepper.step(stepNow * direction);
+    stepsLeft -= stepNow;
+    yield();  // Let system breathe here
+  }
 }
-
-void SoftShock1() {
- // step for 4 seconds in one direction:
-  myStepper1.step(stepsFor4Seconds);
-  delay(50);
-  // step for 4 seconds in the other direction:
-  myStepper1.step(-stepsFor4Seconds);
-  delay(100);
- }
-
- void SoftShock2() {
- // step for 4 seconds in one direction:
-  myStepper2.step(stepsFor4Seconds);
-  delay(50);
-
-  // step for 4 seconds in the other direction:
-  myStepper2.step(-stepsFor4Seconds);
-  delay(100);
- }
-
-void MediumShock1() {
-  // step for 5 seconds in one direction:
-  myStepper1.step(stepsFor5Seconds);
-  delay(50);
-
-  // step for 5 seconds in the other direction:
-  myStepper1.step(-stepsFor5Seconds);
-  delay(100);
- }
-
- void MediumShock2() {
-  // step for 5 seconds in one direction:
-  myStepper2.step(stepsFor5Seconds);
-  delay(50);
-
-  // step for 5 seconds in the other direction:
-  myStepper2.step(-stepsFor5Seconds);
-  delay(100);
- }
-
-
-void HardShock1() {
-  // step for 6 seconds in one direction:
-  myStepper1.step(stepsFor6Seconds);
-  delay(50);
-
-  // step for 6 seconds in the other direction:
-  myStepper1.step(-stepsFor6Seconds);
-  delay(100);
- }
-
- void HardShock2() {
-  // step for 6 seconds in one direction:
-  myStepper2.step(stepsFor6Seconds);
-  delay(50);
-  // step for 6 seconds in the other direction:
-  myStepper2.step(-stepsFor6Seconds);
-  delay(100);
- }
-
- void IntenseShock1() {
-  // step for 7 seconds in one direction:
-  myStepper1.step(stepsFor7Seconds);
-  delay(50);
-  // step for 7 seconds in the other direction:
-  myStepper1.step(-stepsFor7Seconds);
-  delay(100);
- }
-
- void IntenseShock2() {
-  // step for 7 seconds in one direction:
-  myStepper2.step(stepsFor7Seconds);
-  delay(50);
-  // step for 7 seconds in the other direction:
-  myStepper2.step(-stepsFor7Seconds);
-  delay(100);
- }
