@@ -7,3 +7,5 @@
 - M5Stack 2.1.0
 
 ## 
+
+![SystemDesignOverview](https://github.com/n-marcus/Laura-Bellies/blob/main/AlienBetweenUsSystem.png)
