@@ -38,8 +38,8 @@ Stepper myStepper2(stepsPerRevolution, MOTOR2IN1, MOTOR2IN3, MOTOR2IN2, MOTOR2IN
 
 // === ESP-NOW ===
 // CHANGE THIS to your peer's MAC address
-// uint8_t peerMAC[] = {0xCC, 0xDB, 0xA7, 0x3F, 0x9C, 0x14}; //if you're sending to BLACK
-uint8_t peerMAC[] = {0x48, 0xE7, 0x29, 0xAD, 0x16, 0x00}; //if you're sending to RED
+uint8_t peerMAC[] = {0xCC, 0xDB, 0xA7, 0x3F, 0x9C, 0x14}; //if you're sending to BLACK
+//uint8_t peerMAC[] = {0x48, 0xE7, 0x29, 0xAD, 0x16, 0x00}; //if you're sending to RED
 //{0xCC, 0xDB, 0xA7, 0x3F, 0x9C, 0x14}; // BLACK
 //RED address is: {0x48, 0xE7, 0x29, 0xAD, 0x16, 0x00}
 
@@ -93,11 +93,11 @@ void setup() {
 
 // === Motor Behavior ===
 void handleMotor1(int value) {
-  Serial.println("Start handling motor 1 with value " + String(value));
+  //Serial.println("Start handling motor 1 with value " + String(value));
 
   if (value < 1000) {
     // ignore values under 1000
-    Serial.println("Value " + String(value) + " is below 1000 — no shock applied.");
+    // Serial.println("Value " + String(value) + " is below 1000 — no shock applied.");
     return;
   }
 
@@ -118,7 +118,7 @@ void handleMotor1(int value) {
     // between 1500 & 2000
     Serial.println("Value " + String(value) + " — triggering Hardshock");
     DoShock(myStepper1, stepsFor6Seconds, "motor1", "HardShock");
-  } else {
+  } else if (value < 4000){
     // anything above 2000
     Serial.println("Value " + String(value) + " — triggering IntenseShock1()");
     DoShock(myStepper1, stepsFor7Seconds, "motor1", "IntenseShock");
@@ -132,7 +132,7 @@ void handleMotor2(int value) {
   Serial.println("Start handling motor 2 with value " + String(value));
   if (value < 1000) {
     // ignore values under 1000
-    Serial.println("Value " + String(value) + " is below 1000 — no shock applied.");
+    //Serial.println("Value " + String(value) + " is below 1000 — no shock applied.");
     return;
   }
 
@@ -147,15 +147,15 @@ void handleMotor2(int value) {
 
   else if (value < 1500) {
     // between 1000 and 1500
-    Serial.println("Value " + String(value) + " — triggering MediumShock");
+    Serial.println("Value " + String(value) + " — external triggering MediumShock");
     DoShock(myStepper2, stepsFor5Seconds, "motor2", "MediumShock");
   } else if (value < 2000) {
     // between 1500 & 2000
-    Serial.println("Value " + String(value) + " — triggering Hardshock");
+    Serial.println("Value " + String(value) + " — external triggering Hardshock");
     DoShock(myStepper2, stepsFor6Seconds, "motor2", "HardShock");
-  } else {
+  } else if (value < 4000){
     // anything above 2000
-    Serial.println("Value " + String(value) + " — triggering IntenseShock1()");
+    Serial.println("Value " + String(value) + " — external triggering IntenseShock1()");
     DoShock(myStepper2, stepsFor7Seconds, "motor2", "IntenseShock");
   }
   Serial.println("Done handling motor 2");
