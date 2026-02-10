@@ -47,6 +47,8 @@ void updateTouch() {
     beingTouched = false;
   }
 
+
+
   //if touch status changed, send out message to the other pod
   if (beingTouched != _beingTouched) {
     Serial.println("Being touched changed!");

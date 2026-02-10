@@ -132,5 +132,5 @@ void loop() {
     functionUpdateMs = 0;
   }
   // Serial.println("Serial update took: " + String(functionUpdateMs) + "ms");
-  // printDebug();
+  printDebug();
 }

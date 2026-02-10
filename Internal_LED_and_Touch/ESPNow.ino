@@ -73,20 +73,20 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   messagesReceived++;
   memcpy(&receivedData, incomingData, sizeof(receivedData));
   bool targetIsMe = receivedData.target == POD_IDENTIFIER;
-  Serial.print("---Received data #" + String(messagesReceived) + " for " + String(receivedData.target));
-  if (targetIsMe) Serial.print(" which is me!");
-  Serial.println("");
+  // Serial.print("---Received data #" + String(messagesReceived) + " for " + String(receivedData.target));
+  // if (targetIsMe) Serial.print(" which is me!");
+  // Serial.println("");
 
   if (targetIsMe && receivedData.breathingsPerMinute == 0 && receivedData.humanPresence == 0 && receivedData.heartbeatRate == 0 && receivedData.breathingPercentage == -1) {
-    Serial.println("All readings are 0 and not about being touched");
-    Serial.println(" ");
+    // Serial.println("All readings are 0 and not about being touched");
+    // Serial.println(" ");
   } else if (targetIsMe) {
     //if everything was not 0
-    Serial.print("breathingsPerMinute: " + String(receivedData.breathingsPerMinute));
-    Serial.print(" Human presence: " + String(receivedData.humanPresence));
-    Serial.print(" Breathing percentage: " + String(receivedData.breathingPercentage));
-    Serial.println(" Heartrate: " + String(receivedData.heartbeatRate));
-    Serial.println(" ");
+    // Serial.print("breathingsPerMinute: " + String(receivedData.breathingsPerMinute));
+    // Serial.print(" Human presence: " + String(receivedData.humanPresence));
+    // Serial.print(" Breathing percentage: " + String(receivedData.breathingPercentage));
+    // Serial.println(" Heartrate: " + String(receivedData.heartbeatRate));
+    // Serial.println(" ");
   }
 
   if (targetIsMe) {

@@ -18,8 +18,11 @@ typedef struct struct_message {
 // Create a struct_message called myData to hold the received data
 struct_message myData;
 
+elapsedSeconds timeSinceOn;
+int maxSecondsOn = 600;
+
 int heartbeatRate = 60;  //default heartbeat rate in bpm
-bool humanPresence = true;
+bool humanPresence = false;
 int currentInterval = 0;
 
 #define POD_IDENTIFIER 'b'
@@ -49,4 +52,10 @@ void loop() {
   updateLEDs();
   // checkSerial();
   M5.update();  // You can still call M5.update() if needed
+
+  if (timeSinceOn > maxSecondsOn) { 
+    Serial.println("I want to restart");
+    ESP.restart();
+  }
+  
 }
